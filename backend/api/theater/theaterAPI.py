@@ -10,14 +10,14 @@ theater_post_args.add_argument('theater_name', type=str, required=True, help="th
 theater_post_args.add_argument('theater_place', type=str, required=True, help="theater place is required")
 theater_post_args.add_argument('theater_location', type=str, required=True, help="theater location is required")
 theater_post_args.add_argument('theater_capacity', type=str, required=True, help="theater capacity is required")
-theater_post_args.add_argument('theater_image_path', type=str, required=True, help="theater image path is required")
+# theater_post_args.add_argument('theater_image_path', type=str, required=True, help="theater image path is required")
 
 theater_put_args = reqparse.RequestParser()
 theater_put_args.add_argument('theater_name', type=str)
 theater_put_args.add_argument('theater_place', type=str)
 theater_put_args.add_argument('theater_location', type=str)
 theater_put_args.add_argument('theater_capacity', type=str)
-theater_put_args.add_argument('theater_image_path', type=str)
+# theater_put_args.add_argument('theater_image_path', type=str)
 
 resource_fields = {
     'theater_id': fields.Integer,
@@ -31,7 +31,7 @@ resource_fields = {
 class AllTheaterAPI(Resource):
     def get(resource):
         theaters = Theater.query.all()
-        theaters_list = {}
+        theaters_list = []
         for theater in theaters:
             theaters_list.append({'theater_id': theater.theater_id ,'theater_id': theater.theater_id ,'theater_name': theater.theater_name, "theater_place" : theater.theater_place, "theater_location": theater.theater_location, "theater_capacity": theater.theater_capacity, "theater_image_path": theater.theater_image_path})
         return theaters_list
@@ -42,7 +42,7 @@ class AllTheaterAPI(Resource):
         theater= Theater.query.filter_by(theater_name=args["theater_name"]).first()
         if theater:
             abort(409,message= "theater is already exist")
-        input = Theater(theater_name = args["theater_name"], theater_place = args['theater_place'], theater_location = args['theater_location'], theater_capacity = args['theater_capacity'], theater_image_path = args['theater_image_path'])
+        input = Theater(theater_name = args["theater_name"], theater_place = args['theater_place'], theater_location = args['theater_location'], theater_capacity = int(args['theater_capacity']))  #, theater_image_path = args['theater_image_path'])
         db.session.add(input)
         db.session.commit()
         return input, 201

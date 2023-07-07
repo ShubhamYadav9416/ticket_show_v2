@@ -66,7 +66,7 @@ export default{
                 password : this.password,
             }) .then((response) => {
                 if (response.data.status === "success"){
-                    if(response.data.admin === false){alert("Normal user login")
+                    if(response.data.admin === false){
                     const access_token = response.data.access_token;
                     const refresh_token = response.data.refresh_token;
                     const user_mail = response.data.user_mail;
@@ -76,8 +76,6 @@ export default{
                     localStorage.setItem("refresh_token", refresh_token);
                     localStorage.setItem("user_mail", user_mail);
 
-                    console.log(access_token);
-                    console.log(response.data.admin);
                     this.$router.push("/home");
                     return;
                 }
@@ -93,8 +91,6 @@ export default{
                     localStorage.setItem("refresh_token", refresh_token);
                     localStorage.setItem("user_mail", user_mail);
 
-                    console.log(access_token);
-                    console.log(response.data.admin);
 
                     this.$router.push("/admin/dashboard"); 
                     }

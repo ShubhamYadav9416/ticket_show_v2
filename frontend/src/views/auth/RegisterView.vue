@@ -93,10 +93,9 @@ export default {
                     alert("An error occurred while registering the user");
                 });
 
-        },
+        }
 
     }
-
 }
 
 </script>

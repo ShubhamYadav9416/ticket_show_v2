@@ -6,7 +6,7 @@
                     <div class="row">
                         <div class="col" style="background-color: rgb(55, 31, 149);"></div>
                         <div class="col" id="logo-div">
-                            <img src="../assets/logo.png">
+                            <router-link to="/admin/dashboard"><img src="../assets/logo.png"></router-link>
                         </div>
                         <div class="col" style="background-color: rgba(77,70,163,255); color: red;"><span
                                 id="Admin_blink">Admin</span></div>

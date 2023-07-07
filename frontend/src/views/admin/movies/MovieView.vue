@@ -1,33 +1,17 @@
 <template>
     <div id="outer_div">
         <admin-header></admin-header>
-        <div class="container-fluid text-center">
-            <div class="row">
-                <div class="col-2"></div>
-                <div class="col">
-                    <div class="container text-center">
-                        <div class="row">
-                            <div class="col"></div>
-                            <div class="col-2">
-                                hello
-                            </div>
-                            <div class="col"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-2"> </div>
-            </div>
-        </div>
+        <br><br>
         <div class="container-fluid text-center">
             <div class="row">
                 <div class="col-2"></div>
                 <div class="col" v-if="no_table">
-                    <br>
-                    <p>No Table is created</p>
+                    <p>No Movie is created</p><br><br>
                 </div>
                 <div class="col" v-if="show_table">
-                    <br>
-                    <h2>Movies</h2>
+                    <center>
+                    
+                    <h5>Movies</h5>
                     <table>
                         <tr>
                             <th>Movie Id</th>
@@ -51,8 +35,30 @@
                                         class="bi bi-pencil-square" style="color: grey;"></i></a></td>
                         </tr>
                     </table>
+                    </center>
                 </div>
                 <div class="col-2"></div>
+            </div>
+        </div><br><br>
+        <div class="container-fluid text-center">
+            <div class="row">
+                <div class="col-2"></div>
+                <div class="col">
+                    <div class="container text-center">
+                        <div class="row">
+                            <div class="col">
+                                <h6>To Add New Movie</h6>
+                                <router-link to="/admin/add_movie"><button><center>+</center></button></router-link>
+                            </div>
+                            <div class="col-2"></div>
+                            <div class="col">
+                                <h6>To Add New Movie in Theater</h6>
+                                <router-link to="#"><button>+</button></router-link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2"> </div>
             </div>
         </div>
     </div>
@@ -119,11 +125,24 @@ export default {
 
 <style scoped>
 .col {
-    border: 1px solid black;
+    /* border: 1px solid black; */
     margin: 0;
     padding: 0;
 }
 
+button{
+    background-color: rgb(165, 165, 231);
+    border: 0;
+    color: white;
+    width: 50px;
+    height: 50px;
+    font-size: 25px;
+    text-align: center;
+    border-radius: 2rem;
+}
+button:hover{
+    background-color: rgb(126, 126, 230);
+}
 table {
     border: 1px solid black;
     border-collapse: collapse;
@@ -133,7 +152,7 @@ table {
 }
 
 th {
-    background-color: darkblue;
+    background-color: rgb(128, 128, 235);
     color: white;
 }
 
@@ -142,6 +161,7 @@ th {
     padding-left: 12.5px;
     padding-right: 12.5px;
     /* border: 1px solid black; */
+    font-size: small;
 }
 
 td {
@@ -149,7 +169,7 @@ td {
 }
 
 tr:nth-child(even) {
-    background-color: rgb(131, 202, 237);
+    background-color: rgb(207, 231, 243);
 }
 
 tr:nth-child(odd) {

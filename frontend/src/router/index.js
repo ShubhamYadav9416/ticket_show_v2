@@ -46,7 +46,7 @@ const routes = [
     },
     {
         path: "/admin/add_theater",
-        name: "Add-Theater",
+        name: "AddTheater",
         component : AddTheater,
     },
 ];

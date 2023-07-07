@@ -60,12 +60,12 @@ class Theater(db.Model):
     # Relationship with Movie
     movies = db.relationship('TheaterMovie',back_populates='theater')
 
-    def __init__(self,theater_name,theater_place,theater_location,theater_capacity,theater_image_path):
+    def __init__(self,theater_name,theater_place,theater_location,theater_capacity): #,theater_image_path):
         self.theater_name = theater_name
         self.theater_place = theater_place
         self.theater_location = theater_location
         self.theater_capacity= theater_capacity
-        self.theater_image_path = theater_image_path
+        # self.theater_image_path = theater_image_path
     
 
 class Movie(db.Model):
@@ -84,13 +84,13 @@ class Movie(db.Model):
     # Relationship with Theater
     theaters = db.relationship('TheaterMovie',  back_populates='movie')
 
-    def __init__(self,movie_name, movie_tag, movie_language, movie_duration, movie_description, movie_image_path):
+    def __init__(self,movie_name, movie_tag, movie_language, movie_duration, movie_description): #, movie_image_path):
         self.movie_name = movie_name
         self.movie_tag = movie_tag
         self.movie_language = movie_language
         self.movie_duration = movie_duration
         self.movie_description = movie_description
-        self.movie_image_path = movie_image_path
+        # self.movie_image_path = movie_image_path
     
 
 
