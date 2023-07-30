@@ -10,12 +10,12 @@ SECURITY_PASSWORD_HASH = 'bcrypt'
 WTF_CSRF_ENABLED = False
 JWT_SECRET_KEY = 'JWT_SECRET_KEY'
 
-# UPLOAD_FOLDER = 'static/posts/'
-# PROFILE_PICS_FOLDER = 'static/profile'
+MOVIE_UPLOAD_FOLDER = 'static/img/movies/'
+THEATER_UPLOAD_FOLDER = 'static/img/theaters/'
 
 
-ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'png', 'jpeg']
-MAX_CONTENT_LENGTH = 8 * 1024 * 1024
+ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'png', 'jpeg','avif']
+
 
 # CACHE_TYPE = "RedisCache"
 # CACHE_REDIS_URL = "redis://localhost:6379/0"

@@ -32,7 +32,8 @@
                                 <input type="password" class="form-control" id="exampleInputPassword1" v-model="password"
                                     placeholder="Password">
                             </div>
-                            <input type="submit" class="form-control" id="submit" @click.prevent="loginUser()">
+                            <router-link to="/forget_password">Forget Password? </router-link>
+                            <button type="submit" class="form-control" id="submit" @click.prevent="loginUser()">Login</button>
                         </form>
                         </div>
                     </div>

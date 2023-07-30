@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, current_app
 from flask_jwt_extended import JWTManager
 from flask_restful import Resource, Api
 from flask_cors import CORS
@@ -20,9 +20,13 @@ from api.theater.theaterAPI import AllTheaterAPI
 from api.theater.theaterAPI import TheaterAPI
 from api.auth.loginAPI import LoginAPI
 from api.auth.registerAPI import RegisterAPI
-from api.ratings.movieRatingAPI import MovieRatingAPI
-from api.ratings.theaterRatingAPI import TheaterRatingAPI
-from api.theater_movie.TheaterMovieAPI import TheaterMovieAPI
+from api.auth.forgetAPI import ForgetAPI
+from api.ratings.theaterRatingAPI import TheaterUserRatingAPI
+from api.theater_movie.TheaterMovieAPI import linkTheaterMovieAPI
+from api.theater_movie.TheaterMovieAPI import allTheaterMovieAPI
+from api.theater_movie.TheaterMovieAPI import dltTheaterMovieAPI
+from api.theater_movie.TheaterMovieAPI import MoviesAtTheaterAPI
+from api.ratings.theaterRatingAPI import TheaterRating
 
 from api.auth.loginAPI import RefreshTokenAPI
 
@@ -42,6 +46,7 @@ def add_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
     response.headers['Access-Control-Allow-Methods'] = 'GET, PUT, POST, DELETE, OPTIONS'
+
     return response
 
 @app.after_request
@@ -70,10 +75,13 @@ api.add_resource(AllTheaterAPI, "/api/theater")
 api.add_resource(TheaterAPI,"/api/theater/<int:theater_id>")
 api.add_resource(LoginAPI, "/api/login")
 api.add_resource(RegisterAPI, "/api/register")
-api.add_resource(MovieRatingAPI,"/api/rating/movie/<int:user_id>/<int:movie_id>")
-api.add_resource(TheaterRatingAPI,"/api/rating/theater/<int:user_id>/<int:theater_id>")
-api.add_resource(TheaterMovieAPI, "/api/link_theater_movie/<int:theater_id>/<int:movie_id>")
-
+api.add_resource(ForgetAPI,"/api/forget_pass")
+api.add_resource(TheaterUserRatingAPI,"/api/user/rating/theater/<int:theater_id>")
+api.add_resource(TheaterRating, "/api/rating/theater/<int:theater_id>")
+api.add_resource(linkTheaterMovieAPI, "/api/link_theater_movie/<int:theater_id>/<int:movie_id>")
+api.add_resource(allTheaterMovieAPI,"/api/theater_movie")
+api.add_resource(dltTheaterMovieAPI,"/api/dlt/theater_movie/<int:id>")
+api.add_resource(MoviesAtTheaterAPI,"/api/movies_at_theater/home")
 
 api.add_resource(RefreshTokenAPI, "/api/token/refresh")
 

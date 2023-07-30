@@ -26,10 +26,7 @@
                             <input type="number" class="form-control" v-model="theater_capacity" required
                                 placeholder="Theater Capacity">
                         </div>
-                        <div class="input-group mb-3">
-                            <input type="file" class="form-control" id="inputGroupFile01">
-                        </div>
-                        <button type="submit" class="btn btn-primary" @click="addMovie()">Add Theater</button>
+                        <button type="button" class="btn btn-primary" @click="addTheater()">Add Theater</button>
                     </form>
                 </div>
                 <div class="col-4">
@@ -62,7 +59,7 @@ export default {
         'admin-header': AdminHeader
     },
     methods: {
-        async addMovie() {
+        async addTheater() {
             if (!this.theater_name || !this.theater_place || !this.theater_location || !this.theater_capacity) {
                 alert("All fields are required !!");
                 return;
@@ -70,7 +67,7 @@ export default {
             try {
                 let access_token = localStorage.getItem('access_token')
 
-                axios.defaults.headers.common['Authorization'] = 'Bearer' + access_token
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
 
                 await axios.post("http://127.0.0.1:8081/api/theater", {
                     theater_name: this.theater_name,
@@ -83,12 +80,12 @@ export default {
             catch (error) {
                 if (error.response && error.response.status === 401) {
                     await refreshAccessToken();
-                    await this.updateAccount();
+                    await this.addTheater();
                 }
 
                 else if (error.response && error.response.status === 400 || error.response.status === 422) {
                     this.errors = error.response.data.errors;
-                    alert('An error occurred while updating the account.')
+                    alert('An error occurred while creating theater.')
                 }
             }
 

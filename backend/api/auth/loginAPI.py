@@ -31,7 +31,7 @@ class LoginAPI(Resource):
         access_token = create_access_token(identity=user.user_id)
         
         login_user(user)
-        print(user.admin)
+        print("admin = ",user.admin)
         return jsonify({'status': 'success','message': 'Successfully logged in !!', 'access_token': access_token, 'refresh_token': refresh_token , "user_mail": user_mail, "admin" : user.admin})
 
 

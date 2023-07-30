@@ -1,6 +1,6 @@
 from .database import db
 from flask_security import UserMixin, RoleMixin
-
+from sqlalchemy import event
 
 
 UserRoles = db.Table('UserRoles',
@@ -28,10 +28,8 @@ class User(db.Model,UserMixin):
                             backref=db.backref('users', lazy='dynamic'))
     
     # Relationship with Theater
-    ratings_theaters = db.relationship('TheaterRating', backref='users', lazy=True)
+    # ratings_theaters = db.relationship('TheaterRating', backref='users', lazy=True)
     
-    # Relationship with Movie
-    ratings_movies = db.relationship('MovieRating', backref='users', lazy=True)
     
     # token-based authentication
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
@@ -52,20 +50,18 @@ class Theater(db.Model):
     theater_place = db.Column(db.String(100), nullable=False)
     theater_location = db.Column(db.String(100), nullable=False)
     theater_capacity = db.Column(db.Integer, nullable=False)
-    theater_image_path = db.Column(db.String(100), nullable=False, default="/home/shubham/notes/IITM_Projects/mad2/mad2_final_project/instance/default_theater.jpg")
     
     # Relationship with User
-    ratings_by_users = db.relationship('TheaterRating', backref='theater', lazy=True)
+    # ratings_by_users = db.relationship('TheaterRating', backref='theater', lazy=True)
     
     # Relationship with Movie
     movies = db.relationship('TheaterMovie',back_populates='theater')
 
-    def __init__(self,theater_name,theater_place,theater_location,theater_capacity): #,theater_image_path):
+    def __init__(self,theater_name,theater_place,theater_location,theater_capacity):
         self.theater_name = theater_name
         self.theater_place = theater_place
         self.theater_location = theater_location
         self.theater_capacity= theater_capacity
-        # self.theater_image_path = theater_image_path
     
 
 class Movie(db.Model):
@@ -74,50 +70,36 @@ class Movie(db.Model):
     movie_name = db.Column(db.String(100), nullable=False)
     movie_tag = db.Column(db.String(100), nullable=False)
     movie_language = db.Column(db.String(50), nullable=False)
-    movie_duration = db.Column(db.Integer, nullable=False)
-    movie_description = db.Column(db.Text, nullable=False)
+    movie_duration = db.Column(db.String(10), nullable=False)
+    movie_description = db.Column(db.String(200), nullable=False)
     movie_image_path = db.Column(db.String(100), nullable=False, default="/home/shubham/notes/IITM_Projects/mad2/mad2_final_project/instance/default_theater.jpg")
-    
-    # Relationship with User
-    ratings_by_users = db.relationship('MovieRating', backref='movie', lazy=True)
-    
+        
     # Relationship with Theater
     theaters = db.relationship('TheaterMovie',  back_populates='movie')
 
-    def __init__(self,movie_name, movie_tag, movie_language, movie_duration, movie_description): #, movie_image_path):
+    def __init__(self,movie_name, movie_tag, movie_language, movie_duration, movie_description, movie_image_path):
         self.movie_name = movie_name
         self.movie_tag = movie_tag
         self.movie_language = movie_language
         self.movie_duration = movie_duration
         self.movie_description = movie_description
-        # self.movie_image_path = movie_image_path
+        self.movie_image_path = movie_image_path
     
 
 
 # Association table for User-Theater ratings
 class TheaterRating(db.Model):
     __tablename__ = 'user_theater_ratings'
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key=True)
-    theater_id = db.Column(db.Integer, db.ForeignKey('theaters.theater_id'), primary_key=True)
+    user_id = db.Column(db.Integer, primary_key=True)
+    theater_id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Integer, nullable=False)
 
-    def __init__(self,users,theater,rating):
-        self.users = users
-        self.theater = theater
+    def __init__(self,user_id,theater_id,rating):
+        self.user_id = user_id
+        self.theater_id = theater_id
         self.rating = rating
 
 
-# Association table for User-Movie ratings
-class MovieRating(db.Model):
-    __tablename__ = 'user_movie_ratings'
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key=True)
-    movie_id = db.Column(db.Integer, db.ForeignKey('movies.movie_id'), primary_key=True)
-    rating = db.Column(db.Integer, nullable=False)
-
-    def __init__(self,users,movie,rating):
-        self.users = users
-        self.movie = movie
-        self.rating = rating
 
 # Association table for Theater-Movie relationship
 class TheaterMovie(db.Model):
@@ -126,7 +108,7 @@ class TheaterMovie(db.Model):
     theater_id = db.Column(db.Integer, db.ForeignKey('theaters.theater_id'), nullable=False)
     movie_id = db.Column(db.Integer, db.ForeignKey('movies.movie_id'), nullable=False)
     ticket_price = db.Column(db.Integer, nullable=False)
-    timing = db.Column(db.DateTime)
+    timing = db.Column(db.String,nullable=False)
 
     movie= db.relationship('Movie',back_populates = "theaters")
     theater = db.relationship('Theater', back_populates= "movies")
@@ -148,3 +130,26 @@ class Booking(db.Model):
     no_of_tickets = db.Column(db.Integer, nullable=False)
     total_paid = db.Column(db.Integer, nullable=False)
     booking_time = db.Column(db.DateTime)
+
+
+class Dyanmic(db.Model):
+    __tablename__ = "dynamic"
+    theater_movie_id = db.Column(db.Integer, db.ForeignKey('theater_movies.theater_movie_id'), primary_key=True)
+    seats_left = db.Column(db.Integer)
+    current_price = db.Column(db.Integer)
+
+
+    @event.listens_for(TheaterMovie, 'after_insert')
+    def add_dynamic_row(mapper, connection, target):
+        theater = Theater.query.filter_by(theater_id=target.theater_id).first()
+        dynamic_row = Dyanmic(theater_movie_id=target.theater_movie_id,
+                          seats_left=theater.theater_capacity,
+                          current_price=target.ticket_price)
+        connection.execute(Dyanmic.__table__.insert(), dynamic_row.__dict__)
+
+
+    @event.listens_for(TheaterMovie, 'after_delete')
+    def delete_dynamic_row(mapper, connection, target):
+        dynamic_row = Dyanmic.query.filter_by(theater_movie_id=target.theater_movie_id).first()
+        if dynamic_row:
+            connection.execute(Dyanmic.__table__.delete(), dynamic_row.__dict__)

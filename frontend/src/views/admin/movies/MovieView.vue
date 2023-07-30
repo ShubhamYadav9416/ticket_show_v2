@@ -6,7 +6,7 @@
             <div class="row">
                 <div class="col-2"></div>
                 <div class="col" v-if="no_table">
-                    <p>No Movie is created</p><br><br>
+                    <p><i>"No Movie is created"</i></p><br><br>
                 </div>
                 <div class="col" v-if="show_table">
                     <center>
@@ -24,15 +24,19 @@
                             <th>Actions</th>
                         </tr>
                         <tr v-for="movie in movies" :key="movie.movie_id">
-                            <td>{{ movie.id }}</td>
+                            <td>{{ movie.movie_id}}</td>
                             <td>{{ movie.movie_name }}</td>
                             <td>{{ movie.movie_tag }}</td>
                             <td>{{ movie.movie_language }}</td>
                             <td>{{ movie.movie_duration }}</td>
-                            <td>{{ movie.movie_description }} ...</td>
-                            <td><a href="movie.movie_image_path">view</a></td>
-                            <td><a href="#"><i class="bi bi-trash-fill" style="color: brown;"></i></a>/<a href="#"><i
-                                        class="bi bi-pencil-square" style="color: grey;"></i></a></td>
+                            <td>{{ movie.movie_description.slice(0,15) }} ...</td>
+                            <td><p>{{ movie.movie_image_path }}</p></td>
+                            <!-- <td><img src="../../../../../backend/static/img/movies/ant-man-and-the-wasp-quantumania.avif"></td> -->
+                            <!-- <td><img src="../../../assets/ant-man-and-the-wasp-quantumania.avif"></td> -->
+                            <!-- <td><a :href=movie.movie_image_path>view</a></td> -->
+                            <!-- <td><img :src="movie.movie_image_path"></td> -->
+                            <td><a  @click="dltMovie(movie.movie_id)"><i class="bi bi-trash-fill" style="color: brown;"></i></a>/
+                                <router-link  :to="`/admin/movie/edit/${movie.movie_id}`"><i class="bi bi-pencil-square" style="color: grey;"></i></router-link></td>
                         </tr>
                     </table>
                     </center>
@@ -53,7 +57,7 @@
                             <div class="col-2"></div>
                             <div class="col">
                                 <h6>To Add New Movie in Theater</h6>
-                                <router-link to="#"><button>+</button></router-link>
+                                <router-link to="/admin/LinkTheaterMovie"><button>+</button></router-link>
                             </div>
                         </div>
                     </div>
@@ -79,6 +83,7 @@ export default {
             movies: {},
             show_table: false,
             no_table: false,
+            path: "/../../../../../backend/"
         }
     },
     created() {
@@ -89,10 +94,9 @@ export default {
             try {
                 let access_token = localStorage.getItem('access_token')
 
-                axios.defaults.headers.common['Authorization'] = 'Bearer' + access_token
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
 
                 const moviesResponse = await axios.get('http://127.0.0.1:8081/api/movie')
-
                 this.movies = moviesResponse.data
                 if (this.movies.length > 0) {
                     console.log("Movie data fletch")
@@ -111,10 +115,25 @@ export default {
 
                 else if (error.response) {
                     console.error(error)
-                    alert('An error occurred while fetching the followers data.')
+                    alert('An error occurred while fetching the movie data.')
                 }
             }
         },
+        async dltMovie(id){
+            try{
+                let access_token = localStorage.getItem('access_token')
+
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
+            
+                await axios.delete(`http://127.0.0.1:8081/api/movie/${id}`)
+                console.log("Movie with id: " + id + " deleted")
+                await this.allMovies()
+            }
+            catch (error){
+                console.error(error);
+                alert("An error occurred while deleting movie");
+            }
+        }
     },
     components: {
         'admin-header': AdminHeader

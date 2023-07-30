@@ -4,12 +4,18 @@ import VueRouter from "vue-router";
 
 import RegisterView from "../views/auth/RegisterView.vue";
 import LoginView from "../views/auth/LoginView.vue";
+import ForgetPassView from "../views/auth/ForgetPassView.vue";
+
 import DashboardView from "../views/admin/DashboardView.vue";
 import AddMovie from "../views/admin/movies/AddMovie.vue";
 import MovieView from "../views/admin/movies/MovieView.vue";
+import EditMovie from "../views/admin/movies/EditMovie.vue"
 import AddTheater from "../views/admin/theater/AddTheater.vue";
-import TheaterView from "../views/admin/theater/TheaterView.vue"
-
+import TheaterView from "../views/admin/theater/TheaterView.vue";
+import EditTheater from "../views/admin/theater/EditTheater.vue"
+import LinkTheaterMovie from "../views/admin/theater_movie/LinkTheaterMovie.vue"
+import Home from "../views/user/home/Home.vue"
+import MovieBooking from "../views/user/home/MovieBooking.vue"
 
 Vue.use(VueRouter);
 
@@ -23,6 +29,11 @@ const routes = [
         path: "/login",
         name: "LoginView",
         component : LoginView,
+    },
+    {
+        path: "/forget_password",
+        name: "ForgetPassView",
+        component: ForgetPassView,
     },
     {
         path : "/admin/dashboard",
@@ -40,6 +51,11 @@ const routes = [
         component : AddMovie,
     },
     {
+        path: "/admin/movie/edit/:id",
+        name: "Edit-Movie",
+        component: EditMovie,
+    },
+    {
         path : "/admin/theater",
         name : "Admin-Theater",
         component : TheaterView,
@@ -49,6 +65,26 @@ const routes = [
         name: "AddTheater",
         component : AddTheater,
     },
+    {
+        path: "/admin/theater/edit/:id",
+        name: "Edit-Theater",
+        component: EditTheater,
+    },
+    {
+        path: "/admin/LinkTheaterMovie",
+        name: "Link-TheaterMovie",
+        component: LinkTheaterMovie,
+    },
+    {
+        path: "/home",
+        name: "User-Home",
+        component: Home,
+    },
+    {
+        path: "/movie/booking",
+        name: "Movie-Booking",
+        component: MovieBooking,
+    }
 ];
 
 const router = new VueRouter({

@@ -37,7 +37,8 @@
                                     <input type="text" class="form-control" v-model="re_password" required
                                         placeholder="Re-enter password">
                                 </div>
-                                <input type="submit" class="form-control" id="submit" @click="registerUser()">
+                                <button type="button" class="form-control" id="submit" @click="registerUser()">Register</button>
+                                <!-- <input type="submit" class="form-control" id="submit" @click="registerUser()"> -->
                             </form>
                         </div>
                     </div>
@@ -84,9 +85,15 @@ export default {
                     user_mail: this.user_mail,
                     password: this.password,
                 })
-                .then(() => {
-                    alert("Successfully Registered !!")
-                    this.$router.push("/login");
+                .then((response) => {
+                    if (response.data.status === "success"){
+                        alert("Successfully Registered !!")
+                        this.$router.push("/login");
+                    }
+                    if (response.data.status === "failed"){
+                        alert("User Already Exist. Use Forget password")
+                        this.$router.push("/login");
+                    }
                 })
                 .catch((error) => {
                     console.error(error);

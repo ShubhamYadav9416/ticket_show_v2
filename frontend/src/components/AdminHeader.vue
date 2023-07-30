@@ -8,8 +8,9 @@
                         <div class="col" id="logo-div">
                             <router-link to="/admin/dashboard"><img src="../assets/logo.png"></router-link>
                         </div>
-                        <div class="col" style="background-color: rgba(77,70,163,255); color: red;"><span
-                                id="Admin_blink">Admin</span></div>
+                        <div class="col" style="background-color: rgba(77,70,163,255); color: red;">
+                            <span id="Admin_blink">Admin</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -23,13 +24,36 @@
                     to="/admin/movie"><span id="links">Movies</span></router-link>
                 <router-link style="text-decoration: none; color: rgb(228, 222, 222); font-weight: 300; margin-right: 10px;"
                     to="/admin/theater"><span id="links">Theaters</span></router-link>
-                <router-link style="text-decoration: none; color: rgb(228, 222, 222); font-weight: 300; margin-right: 10px;"
-                    to="#"><span id="link_logout">LogOut</span></router-link>
+                <i style="text-decoration: none; color: rgb(228, 222, 222); font-weight: 300; margin-right: 10px;"
+                    @click="logoutAdmin()"><span id="link_logout">LogOut</span></i>
             </div>
         </div>
     </div>
 </template>
 
+<script>
+
+export default {
+    name: 'adminHeader',
+
+    methods: {
+        async logoutAdmin() {
+            try {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('refresh_token')
+                localStorage.removeItem('user_mail')
+
+                alert('Admin Successfully logged out !!')
+                this.$router.push('/login')
+            }
+            catch (error) {
+                console.log(error)
+            }
+        },
+    }
+}
+
+</script>
 
 <style scoped>
 #outer_div {
@@ -81,7 +105,7 @@ img {
 }
 
 #links:hover {
-    color: rgb(3, 5, 110);
+    color: rgb(250, 250, 252);
     font-weight: bolder;
 }
 

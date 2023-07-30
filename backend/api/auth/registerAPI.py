@@ -1,3 +1,4 @@
+from flask import jsonify
 import secrets
 from flask_security.utils import hash_password
 from werkzeug.security import generate_password_hash
@@ -19,7 +20,7 @@ class RegisterAPI(Resource):
 
         user = User.query.filter_by(user_mail=user_mail).first()
         if user:
-            return {'message': 'Mail is already registered !!'}
+            return jsonify({'status':'failed','message': 'Mail is already registered !!'})
         
         hash_password = generate_password_hash(password)
 
@@ -28,7 +29,7 @@ class RegisterAPI(Resource):
         db.session.add(new_user)
         db.session.commit()
 
-        return {'status' : 'success', 'message': 'Successfully Registered !!'}
+        return jsonify({'status' : 'success', 'message': 'Successfully Registered !!'})
     
 
 # {

@@ -2,6 +2,7 @@ import json
 
 from flask import request,jsonify
 from flask_restful import Resource,reqparse,abort,fields,marshal_with
+from flask_jwt_extended.view_decorators import jwt_required
 
 from application.models import db,Theater
 
@@ -29,14 +30,16 @@ resource_fields = {
 }
 
 class AllTheaterAPI(Resource):
+    @jwt_required()
     def get(resource):
         theaters = Theater.query.all()
         theaters_list = []
         for theater in theaters:
-            theaters_list.append({'theater_id': theater.theater_id ,'theater_id': theater.theater_id ,'theater_name': theater.theater_name, "theater_place" : theater.theater_place, "theater_location": theater.theater_location, "theater_capacity": theater.theater_capacity, "theater_image_path": theater.theater_image_path})
+            theaters_list.append({'theater_id': theater.theater_id ,'theater_id': theater.theater_id ,'theater_name': theater.theater_name, "theater_place" : theater.theater_place, "theater_location": theater.theater_location, "theater_capacity": theater.theater_capacity})
         return theaters_list
     
     @marshal_with(resource_fields)
+    @jwt_required()
     def post(resource):
         args = theater_post_args.parse_args()
         theater= Theater.query.filter_by(theater_name=args["theater_name"]).first()
@@ -49,13 +52,16 @@ class AllTheaterAPI(Resource):
     
 class TheaterAPI(Resource):
     @marshal_with(resource_fields)
+    @jwt_required()
     def get(self,theater_id):
         theater = Theater.query.filter_by(theater_id=theater_id).first()
+        print(theater)
         if not theater:
             abort(404, message="Could not found theater with this id")
         return theater
     
     @marshal_with(resource_fields)
+    @jwt_required()
     def put(self,theater_id):
         args = theater_put_args.parse_args()
         theater = Theater.query.filter_by(theater_id = theater_id).first()
@@ -70,19 +76,19 @@ class TheaterAPI(Resource):
             theater.theater_location = args['theater_location']
         if args['theater_capacity']:
             theater.theater_capacity = args['theater_capacity']
-        if args['theater_image_path']:
-            theater.theater_image_path = args['theater_image_path']
         db.session.commit()
         return theater
     
     @marshal_with(resource_fields)
+    @jwt_required()
     def delete(self, theater_id):
         theater = Theater.query.filter_by(theater_id = theater_id).first()
         if not theater:
-            abort(404,message= "theater id not exist")
+            # abort(404,message= "theater id not exist")
+            return jsonify({'status':"failed",'message' : 'Theater not exist!'})
         db.session.delete(theater)
         db.session.commit()
-        return jsonify({'message' : 'Movie has been deleted!'})
+        return jsonify({'status':"success",'message' : 'Theater has been deleted!'})
 
 # {
 #     "theater_name" : "INox",
