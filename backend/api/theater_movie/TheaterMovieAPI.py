@@ -8,6 +8,8 @@ from datetime import datetime
 from flask_restful import Resource,reqparse,abort,fields,marshal_with
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended.view_decorators import jwt_required
+from application.utils.dynamic import calculate_dynamic_cost
+from application.utils.image_encoder import image_to_base64
 
 theater_movie_post_args = reqparse.RequestParser()
 theater_movie_post_args.add_argument('ticket_price', type=int, required = True, help='ticket price is required is required')
@@ -93,7 +95,28 @@ class MoviesAtTheaterAPI(Resource):
         
         return theaters_list
         
-
+class TheaterMovieBooking(Resource):
+    @jwt_required()
+    def get(self,id):
+        theater_movie_id = id
+        theatermovies = TheaterMovie.query.join(Movie,Theater).filter(
+            TheaterMovie.movie_id == Movie.movie_id).filter(
+            TheaterMovie.theater_id == Theater.theater_id).filter(
+            TheaterMovie.theater_movie_id == id).add_columns(
+            TheaterMovie.theater_movie_id,
+            Movie.movie_name, Movie.movie_tag,Movie.movie_duration, Movie.movie_description, Movie.movie_language,Movie.movie_image_path,
+            Theater.theater_place, Theater.theater_location,Theater.theater_capacity,TheaterMovie.timing, TheaterMovie.ticket_price)
+        movie_list = []
+        for theatermovie in theatermovies:
+            dyanmic_fields = Dyanmic.query.filter_by(theater_movie_id = theatermovie.theater_movie_id).first()
+            new_ticket_price = calculate_dynamic_cost(dyanmic_fields.seats_left,theatermovie.theater_capacity,theatermovie.ticket_price, theatermovie.timing)
+            movie_list.append({'theater_movie_id':theatermovie.theater_movie_id,'start_price' : theatermovie.ticket_price ,'movie_name':theatermovie.movie_name, "movie_tag":theatermovie.movie_tag,'movie_language':theatermovie.movie_language,
+                               'movie_duration':theatermovie.movie_duration,'movie_description': theatermovie.movie_description, 'seat_left':dyanmic_fields.seats_left, 'current_price': new_ticket_price,
+                               "theater_place": theatermovie.theater_place, "theater_location":theatermovie.theater_location, "poster_url": image_to_base64(theatermovie.movie_image_path)})
+            dyanmic_fields.current_price = new_ticket_price
+            db.session.commit()
+        return movie_list
+        
 
 
 # {

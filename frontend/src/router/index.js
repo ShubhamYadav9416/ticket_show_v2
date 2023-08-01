@@ -15,7 +15,8 @@ import TheaterView from "../views/admin/theater/TheaterView.vue";
 import EditTheater from "../views/admin/theater/EditTheater.vue"
 import LinkTheaterMovie from "../views/admin/theater_movie/LinkTheaterMovie.vue"
 import Home from "../views/user/home/Home.vue"
-import MovieBooking from "../views/user/home/MovieBooking.vue"
+import MovieBooking from "../views/user/ticket_booking/MovieBooking.vue"
+import UserBooking from "../views/user/booked/UserBookig.vue"
 
 Vue.use(VueRouter);
 
@@ -81,7 +82,12 @@ const routes = [
         component: Home,
     },
     {
-        path: "/movie/booking",
+        path: "/bookings",
+        name: "user-bookings",
+        component: UserBooking,
+    },
+    {
+        path: "/movie/booking/:id",
         name: "Movie-Booking",
         component: MovieBooking,
     }

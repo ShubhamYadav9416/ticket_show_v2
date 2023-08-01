@@ -5,7 +5,7 @@
                 <div class="container-fluid text-center">
                     <div class="row">
                         <div class="col" style="background-color: rgb(55, 31, 149);"></div>
-                        <div class="col" id="logo-div">
+                        <div class="col" id="logo-div" style="background-color: rgba(77,70,163,255);">
                             <router-link to="/home"><img src="../assets/logo.png"></router-link>
                         </div>
                     </div>

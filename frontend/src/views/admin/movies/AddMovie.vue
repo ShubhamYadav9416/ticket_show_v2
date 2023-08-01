@@ -8,7 +8,7 @@
                 </div>
                 <div class="col">
                     <br><br>
-                    <p>To add new Theater<br> Fill this form</p>
+                    <p>To add new Movie<br> Fill this form</p>
                     <form>
                         <div class="mb-3">
                             <input type="text" class="form-control" v-model="movie.movie_name" required 
@@ -90,7 +90,8 @@ export default {
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
 
                 await axios.post("http://127.0.0.1:8081/api/movie", formData)
-                console.log(formData.data)
+                console.log('hello')
+                console.log(formData.values().next())
                 this.$router.push("/admin/movie");
             }
             catch (error) {

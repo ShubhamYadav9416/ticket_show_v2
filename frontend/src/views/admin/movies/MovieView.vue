@@ -10,35 +10,36 @@
                 </div>
                 <div class="col" v-if="show_table">
                     <center>
-                    
-                    <h5>Movies</h5>
-                    <table>
-                        <tr>
-                            <th>Movie Id</th>
-                            <th>Movie Name</th>
-                            <th>Movie Tag</th>
-                            <th>Movie Language</th>
-                            <th>Movie Duration</th>
-                            <th>Movie Description</th>
-                            <th>Movie Poster</th>
-                            <th>Actions</th>
-                        </tr>
-                        <tr v-for="movie in movies" :key="movie.movie_id">
-                            <td>{{ movie.movie_id}}</td>
-                            <td>{{ movie.movie_name }}</td>
-                            <td>{{ movie.movie_tag }}</td>
-                            <td>{{ movie.movie_language }}</td>
-                            <td>{{ movie.movie_duration }}</td>
-                            <td>{{ movie.movie_description.slice(0,15) }} ...</td>
-                            <td><p>{{ movie.movie_image_path }}</p></td>
-                            <!-- <td><img src="../../../../../backend/static/img/movies/ant-man-and-the-wasp-quantumania.avif"></td> -->
-                            <!-- <td><img src="../../../assets/ant-man-and-the-wasp-quantumania.avif"></td> -->
-                            <!-- <td><a :href=movie.movie_image_path>view</a></td> -->
-                            <!-- <td><img :src="movie.movie_image_path"></td> -->
-                            <td><a  @click="dltMovie(movie.movie_id)"><i class="bi bi-trash-fill" style="color: brown;"></i></a>/
-                                <router-link  :to="`/admin/movie/edit/${movie.movie_id}`"><i class="bi bi-pencil-square" style="color: grey;"></i></router-link></td>
-                        </tr>
-                    </table>
+
+                        <h5>Movies</h5>
+                        <table>
+                            <tr>
+                                <th>Movie Id</th>
+                                <th>Movie Name</th>
+                                <th>Movie Tag</th>
+                                <th>Movie Language</th>
+                                <th>Movie Duration</th>
+                                <th>Movie Description</th>
+                                <th>Movie Poster</th>
+                                <th>Actions</th>
+                            </tr>
+                            <tr v-for="movie in movies" :key="movie.movie_id">
+                                <td>{{ movie.movie_id }}</td>
+                                <td>{{ movie.movie_name }}</td>
+                                <td>{{ movie.movie_tag }}</td>
+                                <td>{{ movie.movie_language }}</td>
+                                <td>{{ movie.movie_duration }}</td>
+                                <td>{{ movie.movie_description.slice(0, 15) }} ...</td>
+                                <td>
+                                    <img :src=movie.poster_url style="max-height: 70px; max-width: 35px;">
+                                </td>
+                                <td><a @click="dltMovie(movie.movie_id)"><i class="bi bi-trash-fill"
+                                            style="color: brown;"></i></a>/
+                                    <router-link :to="`/admin/movie/edit/${movie.movie_id}`"><i class="bi bi-pencil-square"
+                                            style="color: grey;"></i></router-link>
+                                </td>
+                            </tr>
+                        </table>
                     </center>
                 </div>
                 <div class="col-2"></div>
@@ -52,7 +53,9 @@
                         <div class="row">
                             <div class="col">
                                 <h6>To Add New Movie</h6>
-                                <router-link to="/admin/add_movie"><button><center>+</center></button></router-link>
+                                <router-link to="/admin/add_movie"><button>
+                                        <center>+</center>
+                                    </button></router-link>
                             </div>
                             <div class="col-2"></div>
                             <div class="col">
@@ -62,7 +65,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-2"> </div>
+                <div class="col-2">
+                </div>
             </div>
         </div>
     </div>
@@ -73,6 +77,8 @@
 <script>
 
 import axios from 'axios';
+
+
 import AdminHeader from '../../../components/AdminHeader'
 
 import refreshAccessToken from '../../../utils/refreshToken'
@@ -83,7 +89,8 @@ export default {
             movies: {},
             show_table: false,
             no_table: false,
-            path: "/../../../../../backend/"
+            posterUrl: "",
+            poster: "",
         }
     },
     created() {
@@ -101,6 +108,9 @@ export default {
                 if (this.movies.length > 0) {
                     console.log("Movie data fletch")
                     this.show_table = true
+                    for (let movie of this.movies){
+                        this.movies[movie.movie_id - 1].poster_url = `data:image/jpeg;base64,${this.movies[movie.movie_id - 1].poster_url}`
+                    }
                 }
                 else {
                     console.log("No movie ceated")
@@ -119,21 +129,21 @@ export default {
                 }
             }
         },
-        async dltMovie(id){
-            try{
+        async dltMovie(id) {
+            try {
                 let access_token = localStorage.getItem('access_token')
 
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
-            
+
                 await axios.delete(`http://127.0.0.1:8081/api/movie/${id}`)
                 console.log("Movie with id: " + id + " deleted")
                 await this.allMovies()
             }
-            catch (error){
+            catch (error) {
                 console.error(error);
                 alert("An error occurred while deleting movie");
             }
-        }
+        },
     },
     components: {
         'admin-header': AdminHeader
@@ -149,7 +159,7 @@ export default {
     padding: 0;
 }
 
-button{
+button {
     background-color: rgb(165, 165, 231);
     border: 0;
     color: white;
@@ -159,9 +169,11 @@ button{
     text-align: center;
     border-radius: 2rem;
 }
-button:hover{
+
+button:hover {
     background-color: rgb(126, 126, 230);
 }
+
 table {
     border: 1px solid black;
     border-collapse: collapse;

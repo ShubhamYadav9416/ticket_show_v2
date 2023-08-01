@@ -27,15 +27,11 @@ class User(db.Model,UserMixin):
     roles = db.relationship('Role', secondary=UserRoles,
                             backref=db.backref('users', lazy='dynamic'))
     
-    # Relationship with Theater
-    # ratings_theaters = db.relationship('TheaterRating', backref='users', lazy=True)
     
     
     # token-based authentication
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
 
-    # Relationship with Booking
-    bookings = db.relationship('Booking', backref='user', lazy=True)
     
     def __init__(self,user_mail, password, admin):
         self.user_mail = user_mail
@@ -84,14 +80,14 @@ class Movie(db.Model):
         self.movie_duration = movie_duration
         self.movie_description = movie_description
         self.movie_image_path = movie_image_path
-    
+
 
 
 # Association table for User-Theater ratings
-class TheaterRating(db.Model):
+class UserTheaterRating(db.Model):
     __tablename__ = 'user_theater_ratings'
-    user_id = db.Column(db.Integer, primary_key=True)
-    theater_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, primary_key = True)
+    theater_id = db.Column(db.Integer, primary_key =True)
     rating = db.Column(db.Integer, nullable=False)
 
     def __init__(self,user_id,theater_id,rating):
@@ -125,11 +121,19 @@ class TheaterMovie(db.Model):
 class Booking(db.Model):
     __tablename__ = 'booking'
     booking_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
     theater_movie_id = db.Column(db.Integer, db.ForeignKey('theater_movies.theater_movie_id'), nullable=False)
     no_of_tickets = db.Column(db.Integer, nullable=False)
     total_paid = db.Column(db.Integer, nullable=False)
     booking_time = db.Column(db.DateTime)
+
+    # user_id = user_id, theater_movie_id = args['theater_movie_id'], no_of_tickets = args['no_of_tickets'], total_paid = args['total_paid'],booking_time= datetime.now())  #, theater_image_path = args['theater_image_path']
+    def __init__(self,user_id,theater_movie_id,no_of_tickets,total_paid,booking_time):
+        self.user_id = user_id
+        self.theater_movie_id = theater_movie_id
+        self.no_of_tickets = no_of_tickets
+        self.total_paid = total_paid
+        self.booking_time = booking_time
 
 
 class Dyanmic(db.Model):

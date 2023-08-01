@@ -1,6 +1,6 @@
 import json
-from PIL import Image
-from flask import request, jsonify
+import os
+from flask import request, jsonify, send_file
 from flask_restful import Resource,reqparse,abort,fields,marshal_with
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended.view_decorators import jwt_required
@@ -8,6 +8,8 @@ from flask_jwt_extended.view_decorators import jwt_required
 from application.models import db,Movie
 from application.config import ALLOWED_IMAGE_EXTENSIONS
 from application.utils.save_movie_img import save_movie_image
+from application.utils.image_encoder import image_to_base64
+
 
 def extension_okay(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
@@ -36,9 +38,8 @@ class AllMovieAPI(Resource):
         movies = Movie.query.all()
         movies_list = []
         for movie in movies:
-            # if movie.movie_image_path != "./none.png":
-            #     poster = Image.open( "/" + movie.movie_image_path)
-            movies_list.append({'movie_id':movie.movie_id,'id':movie.movie_id ,'movie_name': movie.movie_name,'movie_tag':movie.movie_tag,'movie_language':movie.movie_language,'movie_duration':movie.movie_duration,'movie_description':movie.movie_description}) #'movie_name': "/img/ant-man-and-the-wasp-quantumania.6c17d5d7.avif"})
+            base64Poster = image_to_base64(movie.movie_image_path)
+            movies_list.append({'movie_id':movie.movie_id,'id':movie.movie_id ,'movie_name': movie.movie_name,'movie_tag':movie.movie_tag,'movie_language':movie.movie_language,'movie_duration':movie.movie_duration,'movie_description':movie.movie_description,'poster_url':base64Poster})
 
         if movies_list == []:
             return jsonify({"status":"no_data"})
@@ -118,6 +119,26 @@ class MovieAPI(Resource):
         db.session.delete(movie)
         db.session.commit()
         return jsonify({'message' : 'Movie has been deleted!'})
+
+
+
+
+
+
+# class MoviePoster(Resource):
+#     @jwt_required()
+#     def get(self,movie_id):
+#         movie = Movie.query.filter_by(movie_id=movie_id).first()
+#         if movie:
+#             try:
+#                 base64Poster = image_to_base64(movie.movie_image_path)
+#                 return send_file(base64Poster, mimetype='image/jpeg')
+#             except FileNotFoundError:
+#                 return "Image not found", 404
+#         return "Image not found", 404
+    
+
+
 
 # {
 #     "movie_name" : "Dhoom2",

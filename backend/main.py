@@ -3,6 +3,8 @@ from flask import Flask, current_app
 from flask_jwt_extended import JWTManager
 from flask_restful import Resource, Api
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash
+
 
 import application.config as config
 from application.security import user_datastore, security
@@ -27,6 +29,9 @@ from api.theater_movie.TheaterMovieAPI import allTheaterMovieAPI
 from api.theater_movie.TheaterMovieAPI import dltTheaterMovieAPI
 from api.theater_movie.TheaterMovieAPI import MoviesAtTheaterAPI
 from api.ratings.theaterRatingAPI import TheaterRating
+from api.theater_movie.TheaterMovieAPI import TheaterMovieBooking
+from api.ticket_booking.ticketBookingAPI import bookTicket
+from api.ticket_booking.ticketBookingAPI import userBookedTicket
 
 from api.auth.loginAPI import RefreshTokenAPI
 
@@ -82,10 +87,13 @@ api.add_resource(linkTheaterMovieAPI, "/api/link_theater_movie/<int:theater_id>/
 api.add_resource(allTheaterMovieAPI,"/api/theater_movie")
 api.add_resource(dltTheaterMovieAPI,"/api/dlt/theater_movie/<int:id>")
 api.add_resource(MoviesAtTheaterAPI,"/api/movies_at_theater/home")
+api.add_resource(TheaterMovieBooking,"/api/theater_movie/booking/<int:id>")
+api.add_resource(bookTicket,"/api/book_ticket/<int:theater_movie_id>")
+api.add_resource(userBookedTicket,"/api/user/bookings")
 
 api.add_resource(RefreshTokenAPI, "/api/token/refresh")
 
 if __name__ == '__main__':
-  # Run the Flask app
-  app.run(host='0.0.0.0',port=8081)
+    # Run the Flask app
+    app.run(host='0.0.0.0',port=8081)
 

@@ -6,17 +6,23 @@
             <p class="location"><i class="bi bi-geo-alt-fill" style="color:green"></i>{{ theater.theater_place }}, {{
                 theater.theater_location }}
             </p>
-            <p style="font-size: 12px; margin-top: -15px;"><i class="bi bi-star-fill" style="color: red;"></i> 2.2/5 25
+            <p style="font-size: 12px; margin-top: -15px;"><i class="bi bi-star-fill" style="color: red;"></i> {{ theater_cal_rating }}/5 {{ votes }}
                 Votes</p>
-            <form class="d-flex" role="search">
+            <div v-if="show_rate_form">
+            <form class="d-flex" role="search" >
                 <input class="form-control me-2" type="number" placeholder="1 to 5" aria-label="Search"
                     style="width: 60%; height: 30px;" v-model="rate">
-                <button class="btn btn-outline-success" type="button" style="height: 30px; padding-top: 2px;" @click="rateTheater()">
+                <button class="btn btn-outline-success" type="button" style="height: 30px; padding-top: 2px;"
+                    @click="rateTheater()">
                     <p>Rate<i class="bi bi-star" style="color: rgb(235, 183, 183);"></i></p>
                 </button>
             </form>
+            </div>
+            <div v-else>
+               You Rated : {{  user_rating }}<i class="bi bi-star-fill" style="color: red;"></i>
+            </div>
         </div>
-        <ul class="list-group list-group-flush">
+        <ul class="list-group list-group-flush" v-if="theater.movies.length > 0">
             <li class="list-group-item">Currently Showing</li>
             <div v-for="movie in theater.movies" :key="movie.theater_movie_id">
                 <li class="list-group-item"><span class="movie_name">{{ movie.movie_name }}<i class="movie_tag">{{
@@ -31,6 +37,10 @@
                 </li>
             </div>
         </ul>
+        <ul class="list-group list-group-flush" v-else>
+            <li class="list-group-item">No Show Running</li>
+
+            </ul>
     </div>
 </template>
 
@@ -44,13 +54,16 @@ export default {
     props: ['theater'],
     data() {
         return {
-            show_rate_form : false,
-            rate : "",
+            show_rate_form: false,
+            rate: "",
+            user_rating: "",
+            votes : "",
+            theater_cal_rating: ""
         }
     },
     created() {
         this.theateruserRatings(),
-        this.theaterRatings(),
+        this.theaterRatings()
     },
     methods: {
         async theateruserRatings() {
@@ -59,12 +72,11 @@ export default {
 
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
                 const theatersRatingResponse = await axios.get(`http://127.0.0.1:8081/api/user/rating/theater/${this.theater.theater_id}`)
-
-                if (theatersRatingResponse.data.staus === "not_rated"){
+                if (theatersRatingResponse.data.status === "not_rated") {
                     this.show_rate_form = true
                 }
-                else{
-                    this.theater_rating = theatersRatingResponse.data.rating
+                else {
+                    this.user_rating= theatersRatingResponse.data.rating
                     this.show_rate_form = false
                 }
             }
@@ -80,12 +92,12 @@ export default {
                 }
             }
         },
-            async rateTheater() {
-                if (!this.rate || this.rate > 6 || this.rate < 1 ) {
-                    alert("Rate theater between 1 to 5 !!");
-                    return;
-                }
-            
+        async rateTheater() {
+            if (!this.rate || this.rate > 6 || this.rate < 1) {
+                alert("Rate theater between 1 to 5 !!");
+                return;
+            }
+
             try {
                 let access_token = localStorage.getItem('access_token')
 
@@ -95,6 +107,7 @@ export default {
                     rating: this.rate,
                 })
                 this.theateruserRatings()
+                this.theaterRatings()
             }
             catch (error) {
                 if (error.response && error.response.status === 401) {
@@ -109,19 +122,21 @@ export default {
             }
 
         },
-        async theaterRatings(){
+        async theaterRatings() {
             try {
                 let access_token = localStorage.getItem('access_token')
 
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
                 const theatersRatingResponse = await axios.get(`http://127.0.0.1:8081/api/rating/theater/${this.theater.theater_id}`)
 
-                if (theatersRatingResponse.data.staus === "not_rated"){
-                    this.show_rate_form = true
+                if (theatersRatingResponse.data.votes === 0) {
+                    this.votes = "-"
+                    this.theater_cal_rating = "-"
+
                 }
-                else{
-                    this.theater_rating = theatersRatingResponse.data.rating
-                    this.show_rate_form = false
+                else {
+                    this.theater_cal_rating = theatersRatingResponse.data.total_rating / theatersRatingResponse.data.votes
+                    this.votes = theatersRatingResponse.data.votes
                 }
             }
             catch (error) {
@@ -154,4 +169,5 @@ export default {
     font-weight: 200;
     font-size: small;
     margin: 0 20px 0 10px;
-}</style>
+}
+</style>
