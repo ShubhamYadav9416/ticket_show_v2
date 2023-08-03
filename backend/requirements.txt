@@ -6,4 +6,5 @@ bcrypt
 flask_restful
 flask_cors
 flask-jwt-extended
-Pillow
+redis
+celery[redis]

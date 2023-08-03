@@ -9,8 +9,9 @@
                 <div class="col-10">
                     <div class="container text-center" v-show="display">
                         <div class="row" id="display_row">
-                            <div class="col center-block" v-for="theater_movie in theater_movies"  :key="theater_movie.theater_id">
-                                <theater-view style="margin-bottom: 20px;" :theater = "theater_movie"></theater-view>
+                            <div class="col center-block" v-for="theater_movie in theater_movies"
+                                :key="theater_movie.theater_id">
+                                <theater-view style="margin-bottom: 20px;" :theater="theater_movie"></theater-view>
 
                             </div>
                         </div>
@@ -31,10 +32,11 @@ import refreshAccessToken from '@/utils/refreshToken';
 
 export default {
     name: 'UserHome',
-    data(){
-        return{
+    data() {
+        return {
             theater_movies: {},
-            display: false
+            display: false,
+            deferredPrompt: null
         }
     },
     components: {
@@ -42,10 +44,18 @@ export default {
         'filters': Filters,
         'theater-view': TheaterHome,
     },
-    created(){
-        this.allHomeTheaterMovies()
+    created() {
+        this.allHomeTheaterMovies(),
+            window.addEventListener("beforeinstallprompt", (e) => {
+                e.preventDefault();
+                // Stash the event so it can be triggered later.
+                this.deferredPrompt = e;
+            });
     },
-    methods:{
+    methods: {
+        async install() {
+            this.deferredPrompt.prompt();
+        },
         async allHomeTheaterMovies() {
             try {
                 let access_token = localStorage.getItem('access_token')
