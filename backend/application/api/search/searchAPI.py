@@ -1,12 +1,15 @@
+# import essential libraries
 import json
 from datetime import datetime
-
 from flask import request, jsonify
 from flask_restful import Resource,reqparse,abort,fields,marshal_with
 from flask_jwt_extended import jwt_required, get_jwt_identity
+
+# import model tables
 from application.data.models import db,Theater, Movie, TheaterMovie,Dyanmic
 
 class Filters(Resource):
+    # get all theaters movies and place  names
     @jwt_required()
     def get(resource):
         movies  = Movie.query.all()
@@ -25,16 +28,16 @@ class Filters(Resource):
 
 
 class FilterByMovie(Resource):
+    # GET API for filter for movies
     @jwt_required()
     def get(self,id):
         theaters = Theater.query.all()
         theaters_list = []
         for theater in theaters:
-            theatermovies = TheaterMovie.query.join(Movie,Theater).filter(
-            TheaterMovie.movie_id == id).filter(
-            TheaterMovie.theater_id == theater.theater_id).add_columns(
+            theatermovies = TheaterMovie.query.join(Movie,TheaterMovie.movie_id == id).join(
+            Theater,TheaterMovie.theater_id == theater.theater_id).add_columns(
             TheaterMovie.theater_movie_id,Movie.movie_name, Movie.movie_tag,
-            TheaterMovie.timing)
+            TheaterMovie.timing).all()
             movies_list = []
             for theatermovie in theatermovies:
                 dynamic = Dyanmic.query.filter_by(theater_movie_id = theatermovie.theater_movie_id).first()
@@ -53,15 +56,15 @@ class FilterByMovie(Resource):
 
 
 class FilterByTheater(Resource):
+    # GET API fo theater for movies
     @jwt_required()
     def get(self,id):
         theater = Theater.query.filter_by(theater_id = id).first()
         theaters_list = []
-        theatermovies = TheaterMovie.query.join(Movie,Theater).filter(
-            TheaterMovie.movie_id == Movie.movie_id).filter(
-            TheaterMovie.theater_id == id).add_columns(
+        theatermovies = TheaterMovie.query.join(Movie,TheaterMovie.movie_id == Movie.movie_id).join(
+            Theater,TheaterMovie.theater_id == id).add_columns(
             TheaterMovie.theater_movie_id,Movie.movie_name, Movie.movie_tag,
-            TheaterMovie.timing)
+            TheaterMovie.timing).all()
         movies_list = []
         for theatermovie in theatermovies:
             dynamic = Dyanmic.query.filter_by(theater_movie_id = theatermovie.theater_movie_id).first()

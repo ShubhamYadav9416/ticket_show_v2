@@ -21,10 +21,16 @@ import  SearchResult from "../views/user/search/SearchResult.vue"
 
 import UserBooking from "../views/user/booked/UserBookig.vue"
 
+import LandingPage from "../components/LandingPage.vue"
 
 Vue.use(VueRouter);
 
 const routes = [
+    {
+        path: "",
+        name: "Landing-Page",
+        component: LandingPage,
+    },
     {
         path: "/register",
         name: "Registration-Page",

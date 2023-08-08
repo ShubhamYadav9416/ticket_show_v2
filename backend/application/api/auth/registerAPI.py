@@ -1,10 +1,11 @@
+# import essential libaries
 from flask import jsonify
 import secrets
 from flask_security.utils import hash_password
 from werkzeug.security import generate_password_hash
 from flask_restful import Resource, reqparse
 
-
+# import table
 from application.data.models import db, User
 
  
@@ -12,6 +13,8 @@ user_post_args = reqparse.RequestParser()
 user_post_args.add_argument('user_mail', type=str, required=True, help="Username is required !!")
 user_post_args.add_argument('password', type=str, required=True, help='password is required')
 
+
+# register use api
 class RegisterAPI(Resource):
     def post(self):
         args = user_post_args.parse_args()
@@ -19,6 +22,7 @@ class RegisterAPI(Resource):
         password = args.get('password')
 
         user = User.query.filter_by(user_mail=user_mail).first()
+        # if user already register throw status failed
         if user:
             return jsonify({'status':'failed','message': 'Mail is already registered !!'})
         

@@ -46,13 +46,12 @@ class userBookedTicket(Resource):
         bookings = Booking.query.filter_by(user_id = user_id).all()
         tickets = []
         for booking in bookings:
-            theatermovies = TheaterMovie.query.join(Movie,Theater).filter(
-            TheaterMovie.movie_id == Movie.movie_id).filter(
-            TheaterMovie.theater_id == Theater.theater_id).filter(
+            theatermovies = TheaterMovie.query.join(Movie,TheaterMovie.movie_id == Movie.movie_id).join(
+            Theater,TheaterMovie.theater_id == Theater.theater_id).filter_by(
             TheaterMovie.theater_movie_id == booking.theater_movie_id).add_columns(
             TheaterMovie.theater_movie_id,TheaterMovie.timing,Movie.movie_name, Movie.movie_tag,Movie.movie_duration, Movie.movie_language,
             Theater.theater_place,Theater.theater_location,Theater.theater_name, Movie.movie_image_path,
-            TheaterMovie.timing)
+            TheaterMovie.timing).all()
             for theatermovie in theatermovies:
                 tickets.append({'id': booking.booking_id ,'movie_name':theatermovie.movie_name, 'theater_location':theatermovie.theater_location, 'theater_place':theatermovie.theater_place,'theater_name': theatermovie.theater_name,
                             'movie_tag':theatermovie.movie_tag, 'movie_duration':theatermovie.movie_duration, 'movie_language':theatermovie.movie_language,'show_time':theatermovie.timing,

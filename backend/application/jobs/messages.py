@@ -97,12 +97,11 @@ def send_monthly_to_user(id, email):
     bookings = Booking.query.filter_by(user_id=id).all()
     if bookings:
         for booking in bookings:
-            theater_movie = TheaterMovie.query.join(Movie,Theater).filter(
-            TheaterMovie.movie_id == Movie.movie_id).filter(
-            TheaterMovie.theater_id == Theater.theater_id).filter(
+            theater_movie = TheaterMovie.query.join(Movie,TheaterMovie.movie_id == Movie.movie_id).join(
+            Theater,TheaterMovie.theater_id == Theater.theater_id).filter_by(
             TheaterMovie.theater_movie_id == booking.theater_movie_id).add_columns(
             Movie.movie_name, Theater.theater_name,
-            TheaterMovie.timing)
+            TheaterMovie.timing).all()
             bookings_list.append({"booking_id":booking.booking_id, "theater_name":theater_movie[0].theater_name,
                                   "movie_name":theater_movie[0].movie_name,"time":theater_movie[0].timing,
                                   "no_of_tickets":booking.no_of_tickets, "price": booking.total_paid})

@@ -1,16 +1,20 @@
+# impor essential libraries
 import json
 import os
+from time import perf_counter_ns
 from flask import request, jsonify, send_file
 from flask_restful import Resource,reqparse,abort,fields,marshal_with
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended.view_decorators import jwt_required
 
+# import internal functions
 from application.data.models import db,Movie
 from application.config import ALLOWED_IMAGE_EXTENSIONS
 from application.utils.save_movie_img import save_movie_image
 from application.utils.image_encoder import image_to_base64
+from application.data.data_access import get_all_movies
 
-
+# check is file has right format
 def extension_okay(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
  
@@ -32,20 +36,20 @@ resource_fields = {
     'movie_description' : fields.String,
 }
 
+
 class AllMovieAPI(Resource):
+    # ------------------------------------------------------
+    # ----------------Cached endpoint ---------------------
+    # ----------------------------------------------------
     @jwt_required()
     def get(resource):
-        movies = Movie.query.all()
-        movies_list = []
-        for movie in movies:
-            base64Poster = image_to_base64(movie.movie_image_path)
-            movies_list.append({'movie_id':movie.movie_id,'id':movie.movie_id ,'movie_name': movie.movie_name,'movie_tag':movie.movie_tag,'movie_language':movie.movie_language,'movie_duration':movie.movie_duration,'movie_description':movie.movie_description,'poster_url':base64Poster})
-
-        if movies_list == []:
-            return jsonify({"status":"no_data"})
+        start = perf_counter_ns()
+        movies_list = get_all_movies()
+        stop = perf_counter_ns()
+        print('Time Taken', stop-start)
         return movies_list
 
-
+    # post api to add new api
     @jwt_required()
     def post(resource):
         
@@ -80,6 +84,7 @@ class AllMovieAPI(Resource):
 
 
 class MovieAPI(Resource):
+    # get for specific movie 
     @jwt_required()
     @marshal_with(resource_fields)
     def get(self,movie_id):
@@ -88,6 +93,8 @@ class MovieAPI(Resource):
             abort(404, message="Could not found movie with this id")
         return movie
     
+
+    # edit movie
     @jwt_required()
     @marshal_with(resource_fields)
     def put(self,movie_id):
@@ -97,7 +104,6 @@ class MovieAPI(Resource):
         movie = Movie.query.filter_by(movie_id = movie_id).first()
         if not movie:
             abort(404, message="movie doesn't exist.")
-        # input = Movie(movie_id=movie_id, movie_name = args["movie_name"], movie_tag = args['movie_tag'], movie_language = args['movie_language'], movie_duration = args['movie_duration'], movie_description =args['movie_description'] , movie_image_path = args['movie_image_path'])
         if args["movie_name"]:
             movie.movie_name =args["movie_name"]
         if args['movie_tag']:
@@ -111,6 +117,8 @@ class MovieAPI(Resource):
         db.session.commit()
         return movie
     
+
+    # API for delete a movie 
     @jwt_required()
     @marshal_with(resource_fields)
     def delete(self, movie_id):

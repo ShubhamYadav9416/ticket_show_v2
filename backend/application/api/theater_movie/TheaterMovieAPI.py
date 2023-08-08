@@ -1,10 +1,11 @@
+# import essential libraries
 import json
-
+from datetime import datetime
 from flask import request, jsonify
 from flask_restful import Resource,reqparse,abort,fields,marshal_with
-from application.data.models import db,Movie,Theater, TheaterMovie,Dyanmic
-from datetime import datetime
 
+# importing model tables and internal functions
+from application.data.models import db,Movie,Theater, TheaterMovie,Dyanmic 
 from flask_restful import Resource,reqparse,abort,fields,marshal_with
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended.view_decorators import jwt_required
@@ -32,6 +33,8 @@ resource_fields = {
     'timing' : fields.DateTime,
 }
 
+
+# API fo rlinkng theater wioth movies
 class linkTheaterMovieAPI(Resource):
     @jwt_required()
     def post(self, theater_id,movie_id):
@@ -48,17 +51,41 @@ class linkTheaterMovieAPI(Resource):
         return jsonify({'status':'success','message': 'movie and theater linked'})
 
 
+
 class allTheaterMovieAPI(Resource):
+    # API to get speicfic theater movie
     @jwt_required()
-    def get(resource):
-        theatermovies = TheaterMovie.query.join(Movie,Theater).filter(TheaterMovie.movie_id == Movie.movie_id).filter(TheaterMovie.theater_id == Theater.theater_id).add_columns(TheaterMovie.theater_movie_id,Movie.movie_name,Theater.theater_name,TheaterMovie.timing,TheaterMovie.ticket_price)
+    def get(self):
+        theatermovies = (
+            TheaterMovie.query
+            .join(Movie, TheaterMovie.movie_id == Movie.movie_id)
+            .join(Theater, TheaterMovie.theater_id == Theater.theater_id)
+            .add_columns(
+                TheaterMovie.theater_movie_id,
+                Movie.movie_name,
+                Theater.theater_name,
+                TheaterMovie.timing,
+                TheaterMovie.ticket_price
+            )
+            .all()
+        )
+        
         theatermovies_list = []
         for theatermovie in theatermovies:
-            theatermovies_list.append({'id': theatermovie.theater_movie_id ,'theater_movie_id': theatermovie.theater_movie_id ,'theater_name': theatermovie.theater_name ,'movie_name': theatermovie.movie_name, "timing" : theatermovie.timing, "ticket_price": theatermovie.ticket_price})
+            theatermovies_list.append({
+                'id': theatermovie.theater_movie_id,
+                'theater_movie_id': theatermovie.theater_movie_id,
+                'theater_name': theatermovie.theater_name,
+                'movie_name': theatermovie.movie_name,
+                'timing': theatermovie.timing,
+                'ticket_price': theatermovie.ticket_price
+            })
+        
         return theatermovies_list
 
 
 class dltTheaterMovieAPI(Resource):
+    # API for deleting entry in theatermovie table
     @jwt_required()
     def delete(self, id):
         theatermovie = TheaterMovie.query.filter_by(theater_movie_id = id).first()
@@ -70,16 +97,16 @@ class dltTheaterMovieAPI(Resource):
 
 
 class MoviesAtTheaterAPI(Resource):
+    # get theater b with movies
     @jwt_required()
     def get(resource):
         theaters = Theater.query.all()
         theaters_list = []
         for theater in theaters:
-            theatermovies = TheaterMovie.query.join(Movie,Theater).filter(
-            TheaterMovie.movie_id == Movie.movie_id).filter(
-            TheaterMovie.theater_id == theater.theater_id).add_columns(
+            theatermovies = TheaterMovie.query.join(Movie,TheaterMovie.movie_id == Movie.movie_id).join(
+                                                    Theater,TheaterMovie.theater_id == theater.theater_id).add_columns(
             TheaterMovie.theater_movie_id,Movie.movie_name, Movie.movie_tag,
-            TheaterMovie.timing)
+            TheaterMovie.timing).all()
             movies_list = []
             for theatermovie in theatermovies:
                 dynamic = Dyanmic.query.filter_by(theater_movie_id = theatermovie.theater_movie_id).first()
@@ -99,13 +126,12 @@ class TheaterMovieBooking(Resource):
     @jwt_required()
     def get(self,id):
         theater_movie_id = id
-        theatermovies = TheaterMovie.query.join(Movie,Theater).filter(
-            TheaterMovie.movie_id == Movie.movie_id).filter(
-            TheaterMovie.theater_id == Theater.theater_id).filter(
+        theatermovies = TheaterMovie.query.join(Movie,TheaterMovie.movie_id == Movie.movie_id).join(
+            Theater,TheaterMovie.theater_id == Theater.theater_id).filter_by(
             TheaterMovie.theater_movie_id == id).add_columns(
             TheaterMovie.theater_movie_id,
             Movie.movie_name, Movie.movie_tag,Movie.movie_duration, Movie.movie_description, Movie.movie_language,Movie.movie_image_path,
-            Theater.theater_place, Theater.theater_location,Theater.theater_capacity,TheaterMovie.timing, TheaterMovie.ticket_price)
+            Theater.theater_place, Theater.theater_location,Theater.theater_capacity,TheaterMovie.timing, TheaterMovie.ticket_price).all()
         movie_list = []
         for theatermovie in theatermovies:
             dyanmic_fields = Dyanmic.query.filter_by(theater_movie_id = theatermovie.theater_movie_id).first()

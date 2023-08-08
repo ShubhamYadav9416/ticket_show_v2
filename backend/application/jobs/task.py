@@ -70,11 +70,10 @@ def export_csv(id):
 
     rating = total_rate / count
 
-    theater_movies = TheaterMovie.query.join(Movie,Theater).filter(
-            TheaterMovie.movie_id == Movie.movie_id).filter(
-            TheaterMovie.theater_id == id).add_columns(
+    theater_movies = TheaterMovie.query.join(Movie,TheaterMovie.movie_id == Movie.movie_id).join(
+            Theater,TheaterMovie.theater_id == id).add_columns(
             TheaterMovie.theater_movie_id,
-            Movie.movie_name,Theater.theater_name)
+            Movie.movie_name,Theater.theater_name).all()
     if theater_movies:
         for theater_movie in theater_movies:
             bookings = Booking.query.filter_by(theater_movie_id = theater_movie.theater_movie_id).all()

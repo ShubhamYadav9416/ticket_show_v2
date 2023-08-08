@@ -1,3 +1,4 @@
+# Importing essential libraies--------------------------------
 import os
 import secrets
 from flask import Flask, current_app
@@ -7,22 +8,21 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash
 from celery.schedules import crontab
 from werkzeug.security import generate_password_hash
-
-
-
+# importing configs and models---------------------------------
 import application.config as config
 from application.security import user_datastore, security
 from application.data.database import db
 from application.data.models import User
-
+# Import internals for caching--------------------------------
 from application.cache import cache
-
+# Import Libraries for Celery---------------------------------
 from application.jobs.workers import create_celery_app
 from application.jobs import task
 
 
-
-# Import all restfull controllers
+# ------------------------------------------------------------
+# --------------Import all restful API Controllers------------
+# ------------------------------------------------------------
 from application.api.movie.moviesAPI import AllMovieAPI
 from application.api.movie.moviesAPI import MovieAPI
 from application.api.theater.theaterAPI import AllTheaterAPI
@@ -53,11 +53,11 @@ app.config.from_object(config)
 app.app_context().push()
 
 
-# Flask CORS 
+# Flask CORS----------------------------------------
 CORS(app, supports_credentials=True)
 
 
-# Add CORS headers to every response
+# Add CORS headers to every response-----------------
 @app.after_request
 def add_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
@@ -72,9 +72,10 @@ def after_request(response):
     return response
 
 
-# database initialize
+# database initialize---------------------------------
 db.init_app(app)
 
+# Creating a admin user in database when it is a created
 def create_initial_user():
     if User.query.filter_by(user_mail="admin@gmail.com").first() is None:
         admin_user = User(user_mail="admin@gmail.com" , password= generate_password_hash('1234'), admin = True)
@@ -83,17 +84,18 @@ def create_initial_user():
         db.session.commit()
 
 
-# API initilize
+# API initilize---------------------------------------
 api = Api(app)
 api.init_app(app)
 
-# JWT initialization
+# JWT initialization-----------------------------------
 JWTManager(app)
 
 
-# Flask Caching
+# Flask Caching-----------------------------------------
 cache.init_app(app)
 
+# Celery ----------------------------------------------
 cel_app = create_celery_app(app)
 
 cel_app.conf.update(
@@ -103,6 +105,8 @@ cel_app.conf.update(
     enable_utc = False
 )
 
+
+# celery beats tasks scheduling-------------------------
 @cel_app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     # sender.add_periodic_task(
@@ -123,9 +127,11 @@ def setup_periodic_tasks(sender, **kwargs):
     )
 
 
-# Flask Security
+# Flask Security--------------------------------------
 security.init_app(app, user_datastore)
 
+
+# giving paths for APIS--------------------------------
 api.add_resource(AllMovieAPI, "/api/movie")
 api.add_resource(MovieAPI, "/api/movie/<int:movie_id>")
 api.add_resource(AllTheaterAPI, "/api/theater")

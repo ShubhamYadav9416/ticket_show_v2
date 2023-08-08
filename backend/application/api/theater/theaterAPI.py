@@ -1,25 +1,30 @@
+# import all essential libraries
 import json
-
 from flask import request,jsonify
 from flask_restful import Resource,reqparse,abort,fields,marshal_with
 from flask_jwt_extended.view_decorators import jwt_required
 
+# impo tables and internal functions
 from application.data.models import db,Theater
+from application.data.data_access import get_all_theaters
 
+# post args
 theater_post_args = reqparse.RequestParser()
 theater_post_args.add_argument('theater_name', type=str, required=True, help="theater name is required")
 theater_post_args.add_argument('theater_place', type=str, required=True, help="theater place is required")
 theater_post_args.add_argument('theater_location', type=str, required=True, help="theater location is required")
 theater_post_args.add_argument('theater_capacity', type=str, required=True, help="theater capacity is required")
-# theater_post_args.add_argument('theater_image_path', type=str, required=True, help="theater image path is required")
 
+
+# put args
 theater_put_args = reqparse.RequestParser()
 theater_put_args.add_argument('theater_name', type=str)
 theater_put_args.add_argument('theater_place', type=str)
 theater_put_args.add_argument('theater_location', type=str)
 theater_put_args.add_argument('theater_capacity', type=str)
-# theater_put_args.add_argument('theater_image_path', type=str)
 
+
+# resource fields for marshaliing
 resource_fields = {
     'theater_id': fields.Integer,
     'theater_name' : fields.String,
@@ -29,15 +34,19 @@ resource_fields = {
     'theater_image_path' : fields.String
 }
 
+
+
 class AllTheaterAPI(Resource):
+    # --------------------------------------------------
+    # --------------theater caching--------------------
+    # -------------------------------------------------
+    # get all movies
     @jwt_required()
     def get(resource):
-        theaters = Theater.query.all()
-        theaters_list = []
-        for theater in theaters:
-            theaters_list.append({'theater_id': theater.theater_id ,'theater_id': theater.theater_id ,'theater_name': theater.theater_name, "theater_place" : theater.theater_place, "theater_location": theater.theater_location, "theater_capacity": theater.theater_capacity})
+        theaters_list = get_all_theaters()
         return theaters_list
     
+    # post a theater
     @marshal_with(resource_fields)
     @jwt_required()
     def post(resource):
@@ -51,6 +60,7 @@ class AllTheaterAPI(Resource):
         return input, 201
     
 class TheaterAPI(Resource):
+    # get specific theater
     @marshal_with(resource_fields)
     @jwt_required()
     def get(self,theater_id):
@@ -60,6 +70,7 @@ class TheaterAPI(Resource):
             abort(404, message="Could not found theater with this id")
         return theater
     
+    # API for theater edit
     @marshal_with(resource_fields)
     @jwt_required()
     def put(self,theater_id):
@@ -79,6 +90,7 @@ class TheaterAPI(Resource):
         db.session.commit()
         return theater
     
+    # API for deleting theater
     @marshal_with(resource_fields)
     @jwt_required()
     def delete(self, theater_id):
@@ -89,6 +101,7 @@ class TheaterAPI(Resource):
         db.session.delete(theater)
         db.session.commit()
         return jsonify({'status':"success",'message' : 'Theater has been deleted!'})
+
 
 # {
 #     "theater_name" : "INox",

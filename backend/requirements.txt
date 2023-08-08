@@ -10,3 +10,4 @@ redis
 celery[redis]
 Flask-Caching
 jinja2
+weasyprint==52.5

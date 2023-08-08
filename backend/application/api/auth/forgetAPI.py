@@ -1,13 +1,14 @@
+# import essential libraries
 from flask import jsonify
 import secrets
 from flask_security.utils import hash_password
 from werkzeug.security import generate_password_hash
 from flask_restful import Resource, reqparse
 
-
+# import Tables
 from application.data.models import db, User
 
- 
+# for put args
 user_put_args = reqparse.RequestParser()
 user_put_args.add_argument('user_mail', type=str, required=True, help="Username is required !!")
 user_put_args.add_argument('password', type=str, required=True, help='password is required')

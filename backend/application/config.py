@@ -17,10 +17,10 @@ THEATER_UPLOAD_FOLDER = 'static/img/theaters/'
 ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'png', 'jpeg','avif']
 
 
-# CACHE_TYPE = "RedisCache"
-# CACHE_REDIS_URL = "redis://localhost:6379/0"
-# CACHE_DEFAULT_TIMEOUT = 300
-# DEBUG = False
+CACHE_TYPE = "RedisCache"
+CACHE_REDIS_URL = "redis://localhost:6379/0"
+CACHE_DEFAULT_TIMEOUT = 300
+DEBUG = False
 
 
 CELERY_BROKER_URL = "redis://localhost:6379/1"
