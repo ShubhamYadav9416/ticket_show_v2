@@ -115,6 +115,7 @@ export default {
                 else {
                     console.log("No movie ceated")
                     this.no_table = true
+                    this.show_table = false
                 }
             }
             catch (error) {
@@ -141,7 +142,7 @@ export default {
             }
             catch (error) {
                 console.error(error);
-                alert("An error occurred while deleting movie");
+                alert("Movie running in theater");
             }
         },
     },

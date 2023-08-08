@@ -17,6 +17,8 @@
                             <th>Theater Loaction</th>
                             <th>Theater Capacity</th>
                             <th>Actions</th>
+                            <th>Export CSV</th>
+
                         </tr>
                         <tr v-for="theater in theaters" :key="theater.theater_id">
                             <td>{{ theater.theater_id }}</td>
@@ -26,6 +28,8 @@
                             <td>{{ theater.theater_capacity }}</td>
                             <td><a id="dlt" @click="dltTheater(theater.theater_id)"><i class="bi bi-trash-fill" style="color: brown;"></i></a>/
                                 <router-link  :to="`/admin/theater/edit/${theater.theater_id}`"><i class="bi bi-pencil-square" style="color: grey;"></i></router-link></td>
+                            <td> <button type="button" class="btn btn-primary" @click="triggerCSVExport(theater.theater_id)"><i class="bi bi-cloud-arrow-down"></i></button> </td>
+
                         </tr>
                     </table>
                 </div>
@@ -40,12 +44,12 @@
                         <div class="row">
                             <div class="col">
                                 <h6>To Add New Theater</h6>
-                                <router-link to="/admin/add_theater"><button><center>+</center></button></router-link>
+                                <router-link to="/admin/add_theater"><button class="add_button"><center>+</center></button></router-link>
                             </div>
                             <div class="col"></div>
                             <div class="col">
                                 <h6>To Add New Movie in Theater</h6>
-                                <router-link to="/admin/LinkTheaterMovie"><button>+</button></router-link>
+                                <router-link to="/admin/LinkTheaterMovie"><button class="add_button">+</button></router-link>
                             </div>
                         </div>
                     </div>
@@ -121,10 +125,29 @@ export default {
             }
             catch (error){
                 console.error(error);
-                alert("An error occurred while deleteing theater");
+                alert("Theater has Movie running.");
             }
 
         },
+        async triggerCSVExport(id) {
+            try {
+                let access_token = localStorage.getItem('access_token')
+
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
+                await axios.get(`http://127.0.0.1:8081/api/export_csv/${id}`)
+                alert("CSV Fill Sent on Your Email")
+            }
+            catch (error) {
+                if (error.response && error.response.status === 401) {
+                    await refreshAccessToken()
+                    await this.triggerCSVExport(id)
+                }
+                else if (error.response) {
+                    console.error(error)
+                    alert('An error occurred while exporting the theater data.')
+                }
+            }
+        }
     },
     components: {
         'admin-header': AdminHeader
@@ -140,7 +163,7 @@ export default {
     padding: 0;
 }
 
-button{
+.add_button{
     background-color: rgb(165, 165, 231);
     border: 0;
     color: white;
@@ -150,7 +173,7 @@ button{
     text-align: center;
     border-radius: 2rem;
 }
-button:hover{
+.add_button:hover{
     background-color: rgb(126, 126, 230);
 }
 table {

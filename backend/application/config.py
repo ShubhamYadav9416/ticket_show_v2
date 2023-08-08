@@ -22,5 +22,6 @@ ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'png', 'jpeg','avif']
 # CACHE_DEFAULT_TIMEOUT = 300
 # DEBUG = False
 
-# CELERY_BROKER_URL = "redis://localhost:6379/1"
-# CELERY_RESULT_BACKEND = "redis://localhost:6379/2"
+
+CELERY_BROKER_URL = "redis://localhost:6379/1"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/2"

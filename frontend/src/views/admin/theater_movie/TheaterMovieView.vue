@@ -54,6 +54,8 @@
                                     <td>{{ item.ticket_price }}</td>
                                     <td>{{ ((new Date(item.timing)).toString()).slice(0, 16) }}</td>
                                     <td>{{ ((new Date(item.timing)).toString()).slice(16, 21) }}</td>
+                                    <td><a @click="dltTheaterMovie(item.theater_movie_id)"><i class="bi bi-trash-fill"
+                                                style="color: brown;"></i></a></td>
                                 </tr>
                             </table>
                         </center>
@@ -88,7 +90,7 @@ export default {
         return {
             alltheatermovies: {},
             runningBooking: [],
-            stopedBooking: {},
+            stopedBooking: [],
             running_table: false,
             stoped_table: false,
             table: false,
@@ -106,7 +108,6 @@ export default {
 
                 const theaterMoviesResponse = await axios.get('http://127.0.0.1:8081/api/theater_movie')
                 this.alltheatermovies = theaterMoviesResponse.data
-                console.log(this.alltheatermovies)
                 if (this.alltheatermovies.length > 0) {
                     console.log("theaterMovie data fletch")
                     this.table = true
@@ -118,14 +119,14 @@ export default {
                             this.runningBooking.push(theatermovie)
                         }
                         else {
-                            console.log("hi")
                             this.stopedBooking.push(theatermovie)
                         }
                     }
+                    console.log(this.runningBooking)
                     if (this.runningBooking.length > 0) {
                         this.running_table = true
                     }
-                    else if (this.stopedBooking.length > 0) {
+                    if (this.stopedBooking.length > 0) {
                         this.stoped_table = true
                     }
                 }

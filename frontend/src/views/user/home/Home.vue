@@ -4,7 +4,7 @@
         <div class="container-fluid text-center">
             <div class="row">
                 <div class="col-2">
-                    <filters></filters>
+                    <!-- <filters></filters> -->
                 </div>
                 <div class="col-10">
                     <div class="container text-center" v-show="display">
@@ -24,7 +24,7 @@
 
 <script>
 import UserHeaderVue from '@/components/UserHeader.vue';
-import Filters from './Filters.vue';
+// import Filters from './Filters.vue';
 import TheaterHome from './TheaterHome.vue';
 
 import axios from 'axios';
@@ -36,26 +36,17 @@ export default {
         return {
             theater_movies: {},
             display: false,
-            deferredPrompt: null
         }
     },
     components: {
         'user-header': UserHeaderVue,
-        'filters': Filters,
+        // 'filters': Filters,
         'theater-view': TheaterHome,
     },
     created() {
-        this.allHomeTheaterMovies(),
-            window.addEventListener("beforeinstallprompt", (e) => {
-                e.preventDefault();
-                // Stash the event so it can be triggered later.
-                this.deferredPrompt = e;
-            });
+        this.allHomeTheaterMovies()
     },
     methods: {
-        async install() {
-            this.deferredPrompt.prompt();
-        },
         async allHomeTheaterMovies() {
             try {
                 let access_token = localStorage.getItem('access_token')

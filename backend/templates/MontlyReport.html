@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    <title>Document</title>
+</head>
+
+<body>
+
+
+    <div class="container-flex text-center">
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col" align="left">
+                <p>Hello {{ user_mail.split('@')[0] }}</p>
+                <p>Your Monthly Report</p>
+                {% if has_booking %}
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Movie</th>
+                        <th scope="col">Theater</th>
+                        <th scope="col">Show Time</th>
+                        <th scope="col">No. of Ticket</th>
+                        <th scope="col">You Paid</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                      <tr>
+                        <th scope="row">{{ booking.booking_id }}</th>
+                        <td>{{ booking.movie_name }}</td>
+                        <td>{{ booking.theater_name }}</td>
+                        <td>{{ booking.time }}</td>
+                        <td> {{ booking.no_of_tickets }} </td>
+                        <td>{{ booking.price }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  {% else %}
+                  You have not Watched any movie this month.
+                  {% endif %}
+
+                We are Here will some exciting movies for you this month.
+                <div class="container text-center">
+                    <div class="row">
+                        {% for movie in movies %}
+                        <div class="col">
+                            <div class="card" style="width: 150px;">
+                                <div class="card-body" style="padding-top:0;">
+                                    <p class="card-text">
+        
+                                    <h6>{{ movie.movie_name }}</h6>
+                                    {{ movie.movie_tag }}| {{ movie.movie_language }} | {{ movie.movie_duration }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <br> What You Waiting For CINEPASS And secure Your ticket.<br>
+                Cinepass Team.
+            </div>
+            <div class="col-1"></div>
+        </div>
+    </div>
+
+</body>
+
+</html>

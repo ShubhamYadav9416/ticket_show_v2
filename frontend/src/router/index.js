@@ -16,7 +16,11 @@ import EditTheater from "../views/admin/theater/EditTheater.vue"
 import LinkTheaterMovie from "../views/admin/theater_movie/LinkTheaterMovie.vue"
 import Home from "../views/user/home/Home.vue"
 import MovieBooking from "../views/user/ticket_booking/MovieBooking.vue"
+import Search from "../views/user/search/Search.vue"
+import  SearchResult from "../views/user/search/SearchResult.vue"
+
 import UserBooking from "../views/user/booked/UserBookig.vue"
+
 
 Vue.use(VueRouter);
 
@@ -90,6 +94,17 @@ const routes = [
         path: "/movie/booking/:id",
         name: "Movie-Booking",
         component: MovieBooking,
+    },
+    {
+        path: "/search",
+        name: "user-search",
+        component: Search,
+    },
+    {
+        path : "/search/result",
+        name: "search-result",
+        props:route => ({ theater_movies: route.query.allTheaterMovieResponse }),
+        component: SearchResult,
     }
 ];
 

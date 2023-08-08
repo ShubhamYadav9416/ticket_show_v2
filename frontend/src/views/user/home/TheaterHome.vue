@@ -69,9 +69,9 @@ export default {
         async theateruserRatings() {
             try {
                 let access_token = localStorage.getItem('access_token')
-
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
                 const theatersRatingResponse = await axios.get(`http://127.0.0.1:8081/api/user/rating/theater/${this.theater.theater_id}`)
+                console.log(theatersRatingResponse)
                 if (theatersRatingResponse.data.status === "not_rated") {
                     this.show_rate_form = true
                 }
@@ -142,7 +142,7 @@ export default {
             catch (error) {
                 if (error.response && error.response.status === 401) {
                     await refreshAccessToken()
-                    await this.theateruserRatings()
+                    await this.theaterRatings()
                 }
 
                 else if (error.response) {

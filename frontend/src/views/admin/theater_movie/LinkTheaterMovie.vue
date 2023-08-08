@@ -12,18 +12,18 @@
                     <form>
                         <div class="mb-3">
                             <label class="form-label">Select Theater</label>
-                            <select class="form-select" v-model="selected_theater_id" v-for="theater in theaters" :key="theater.theater_id">
+                            <select class="form-select" v-model="selected_theater_id" >
                                 <!-- <option selected disabled value="" >Choose Theater...</option> -->
-                                <option :value=theater.theater_id>{{ theater.theater_name }} {{ theater.theater_place }}
+                                <option v-for="theater in theaters" :key="theater.theater_id" :value=theater.theater_id>{{ theater.theater_name }} {{ theater.theater_place }}
                                 </option>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Select Movie</label>
-                            <select class="form-select" v-for="movie in movies" :key="movie.movie_id" v-model="selected_movie_id">
+                            <select class="form-select" v-model="selected_movie_id">
                                 <!-- <option selected disabled value="">Choose Movie...</option> -->
-                                <option :value=movie.movie_id>{{ movie.movie_name }}</option>
+                                <option v-for="movie in movies" :key="movie.movie_id" :value=movie.movie_id>{{ movie.movie_name }}</option>
                             </select>
                         </div>
 

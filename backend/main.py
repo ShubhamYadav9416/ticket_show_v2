@@ -1,39 +1,51 @@
 import os
+import secrets
 from flask import Flask, current_app
 from flask_jwt_extended import JWTManager
 from flask_restful import Resource, Api
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash
+from celery.schedules import crontab
+from werkzeug.security import generate_password_hash
+
 
 
 import application.config as config
 from application.security import user_datastore, security
-from application.database import db
+from application.data.database import db
+from application.data.models import User
+
+from application.cache import cache
+
+from application.jobs.workers import create_celery_app
+from application.jobs import task
 
 
-
-# Import all the controllers so they are loaded
-from application.controllers import *
 
 # Import all restfull controllers
-from api.movie.moviesAPI import AllMovieAPI
-from api.movie.moviesAPI import MovieAPI
-from api.theater.theaterAPI import AllTheaterAPI
-from api.theater.theaterAPI import TheaterAPI
-from api.auth.loginAPI import LoginAPI
-from api.auth.registerAPI import RegisterAPI
-from api.auth.forgetAPI import ForgetAPI
-from api.ratings.theaterRatingAPI import TheaterUserRatingAPI
-from api.theater_movie.TheaterMovieAPI import linkTheaterMovieAPI
-from api.theater_movie.TheaterMovieAPI import allTheaterMovieAPI
-from api.theater_movie.TheaterMovieAPI import dltTheaterMovieAPI
-from api.theater_movie.TheaterMovieAPI import MoviesAtTheaterAPI
-from api.ratings.theaterRatingAPI import TheaterRating
-from api.theater_movie.TheaterMovieAPI import TheaterMovieBooking
-from api.ticket_booking.ticketBookingAPI import bookTicket
-from api.ticket_booking.ticketBookingAPI import userBookedTicket
+from application.api.movie.moviesAPI import AllMovieAPI
+from application.api.movie.moviesAPI import MovieAPI
+from application.api.theater.theaterAPI import AllTheaterAPI
+from application.api.theater.theaterAPI import TheaterAPI
+from application.api.auth.loginAPI import LoginAPI
+from application.api.auth.registerAPI import RegisterAPI
+from application.api.auth.forgetAPI import ForgetAPI
+from application.api.ratings.theaterRatingAPI import TheaterUserRatingAPI
+from application.api.theater_movie.TheaterMovieAPI import linkTheaterMovieAPI
+from application.api.theater_movie.TheaterMovieAPI import allTheaterMovieAPI
+from application.api.theater_movie.TheaterMovieAPI import dltTheaterMovieAPI
+from application.api.theater_movie.TheaterMovieAPI import MoviesAtTheaterAPI
+from application.api.ratings.theaterRatingAPI import TheaterRating
+from application.api.theater_movie.TheaterMovieAPI import TheaterMovieBooking
+from application.api.ticket_booking.ticketBookingAPI import bookTicket
+from application.api.ticket_booking.ticketBookingAPI import userBookedTicket
+from application.api.search.searchAPI import Filters
+from application.api.search.searchAPI import FilterByMovie
+from application.api.search.searchAPI import FilterByTheater
 
-from api.auth.loginAPI import RefreshTokenAPI
+from application.api.export_csv.exportCSVAPI import Export_CSV_API
+
+from application.api.auth.loginAPI import RefreshTokenAPI
 
 
 app = Flask(__name__)
@@ -63,12 +75,52 @@ def after_request(response):
 # database initialize
 db.init_app(app)
 
+def create_initial_user():
+    if User.query.filter_by(user_mail="admin@gmail.com").first() is None:
+        admin_user = User(user_mail="admin@gmail.com" , password= generate_password_hash('1234'), admin = True)
+        admin_user.fs_uniquifier = secrets.token_hex(16)
+        db.session.add(admin_user)
+        db.session.commit()
+
+
 # API initilize
 api = Api(app)
 api.init_app(app)
 
 # JWT initialization
 JWTManager(app)
+
+
+# Flask Caching
+cache.init_app(app)
+
+cel_app = create_celery_app(app)
+
+cel_app.conf.update(
+    broker = app.config['CELERY_BROKER_URL'],
+    backend = app.config['CELERY_RESULT_BACKEND'],
+    timezone = 'Asia/Calcutta',
+    enable_utc = False
+)
+
+@cel_app.on_after_finalize.connect
+def setup_periodic_tasks(sender, **kwargs):
+    # sender.add_periodic_task(
+    #     10.0, 
+    #     task.send_mail_monthly.s(), 
+    #     name='Reminder every 10 seconds.'
+    # )
+    sender.add_periodic_task(
+        crontab(minute=0, hour=19, day_of_month='*'),
+        task.send_mail_daily.s(),
+        name = 'Daily reminder everyday @7PM via mail.'
+    )
+
+    sender.add_periodic_task(
+        crontab(day_of_month=1, month_of_year='*'),
+        task.send_mail_monthly.s(),
+        name = 'Monthly Engagement Report @1st of every month via mail.'
+    )
 
 
 # Flask Security
@@ -90,10 +142,20 @@ api.add_resource(MoviesAtTheaterAPI,"/api/movies_at_theater/home")
 api.add_resource(TheaterMovieBooking,"/api/theater_movie/booking/<int:id>")
 api.add_resource(bookTicket,"/api/book_ticket/<int:theater_movie_id>")
 api.add_resource(userBookedTicket,"/api/user/bookings")
+api.add_resource(Filters,'/api/search/filters')
+api.add_resource(FilterByMovie,'/api/search/movie/<int:id>')
+api.add_resource(FilterByTheater, '/api/search/theater/<int:id>')
+
+api.add_resource(Export_CSV_API, '/api/export_csv/<int:id>')
 
 api.add_resource(RefreshTokenAPI, "/api/token/refresh")
 
+
+with app.app_context():
+    db.create_all()
+    create_initial_user()
+
 if __name__ == '__main__':
     # Run the Flask app
-    app.run(host='0.0.0.0',port=8081)
+    app.run(host='0.0.0.0',port=8081,debug=True)
 

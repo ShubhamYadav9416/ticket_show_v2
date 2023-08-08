@@ -83,14 +83,12 @@ export default {
             if (this.movie_poster) {
                 formData.append('movie_poster', this.movie_poster)
             }
-            console.log(this.movie_poster)
             try {
                 let access_token = localStorage.getItem('access_token')
 
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
 
                 await axios.post("http://127.0.0.1:8081/api/movie", formData)
-                console.log('hello')
                 console.log(formData.values().next())
                 this.$router.push("/admin/movie");
             }
