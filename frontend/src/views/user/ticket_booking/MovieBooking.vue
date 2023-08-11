@@ -153,6 +153,10 @@ export default {
                 alert("Add Number of Ticekt !!");
                 return;
             }
+            else if (this.no_of_tickets < 0 || this.no_of_tickets > 10){
+                alert("no. of ticket can't be less than 0 and greater than 9");
+                return;
+            }
             try {
 
                 let formData = new FormData()

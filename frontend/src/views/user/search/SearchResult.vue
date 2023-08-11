@@ -4,6 +4,7 @@
         <div class="container-fluid text-center">
             <div class="row" style="margin-top: 60px;">
                 <div class="col-2">
+                    {{ theater_movies }}
                     <router-link to="/home">Return to Home Page</router-link>
                 </div>
                 <div class="col-10">

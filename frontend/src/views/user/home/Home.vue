@@ -4,7 +4,7 @@
         <div class="container-fluid text-center">
             <div class="row">
                 <div class="col-2">
-                    <!-- <filters></filters> -->
+                    <filters :theater_movies_for_filters = "theater_movies"></filters>
                 </div>
                 <div class="col-10">
                     <div class="container text-center" v-show="display">
@@ -12,7 +12,7 @@
                             <div class="col center-block" v-for="theater_movie in theater_movies"
                                 :key="theater_movie.theater_id">
                                 <theater-view style="margin-bottom: 20px;" :theater="theater_movie"></theater-view>
-
+{{ theater_movies }}
                             </div>
                         </div>
                     </div>
@@ -24,7 +24,7 @@
 
 <script>
 import UserHeaderVue from '@/components/UserHeader.vue';
-// import Filters from './Filters.vue';
+import Filters from './Filters.vue';
 import TheaterHome from './TheaterHome.vue';
 
 import axios from 'axios';
@@ -40,7 +40,7 @@ export default {
     },
     components: {
         'user-header': UserHeaderVue,
-        // 'filters': Filters,
+        'filters': Filters,
         'theater-view': TheaterHome,
     },
     created() {

@@ -27,8 +27,10 @@
                                     <td>{{ item.ticket_price }}</td>
                                     <td>{{ ((new Date(item.timing)).toString()).slice(0, 16) }}</td>
                                     <td>{{ ((new Date(item.timing)).toString()).slice(16, 21) }}</td>
-                                    <td><a @click="dltTheaterMovie(item.theater_movie_id)"><i class="bi bi-trash-fill"
+                                    <td><a @click="showConfirmationModal(item.theater_movie_id)"><i class="bi bi-trash-fill"
                                                 style="color: brown;"></i></a></td>
+                                    <ConfirmationModal v-if="showModal" message="Are you sure you want to delete? This will also delete all booking in this Theater of this movie."
+                                        :onConfirm="deleteItem" :onCancel="cancelDelete" />
                                 </tr>
                             </table>
                         </center>
@@ -45,7 +47,7 @@
                                     <th>Ticket Price</th>
                                     <th>Show Date</th>
                                     <th>Show Timing</th>
-                                    <th>Actions</th>
+                                    <!-- <th>Actions</th> -->
                                 </tr>
                                 <tr v-for="item in stopedBooking" :key="item.id">
                                     <td>{{ item.theater_movie_id }}</td>
@@ -54,8 +56,10 @@
                                     <td>{{ item.ticket_price }}</td>
                                     <td>{{ ((new Date(item.timing)).toString()).slice(0, 16) }}</td>
                                     <td>{{ ((new Date(item.timing)).toString()).slice(16, 21) }}</td>
-                                    <td><a @click="dltTheaterMovie(item.theater_movie_id)"><i class="bi bi-trash-fill"
+                                    <!-- <td><a @click="showConfirmationModal(item.theater_movie_id)"><i class="bi bi-trash-fill"
                                                 style="color: brown;"></i></a></td>
+                                    <ConfirmationModal v-if="showModal" message="Are you sure you want to delete? This will delete all bookings."
+                                        :onConfirm="deleteItem" :onCancel="cancelDelete" /> -->
                                 </tr>
                             </table>
                         </center>
@@ -67,13 +71,13 @@
                 <div class="col-2"></div>
             </div>
         </div><br><br>
-                <center>
-                <div>
-                    <h6>To Add New Movie in Theater</h6>
-                    <router-link to="/admin/LinkTheaterMovie"><button>+</button></router-link>
-                </div>
-                </center>
+        <center>
+            <div>
+                <h6>To Add New Movie in Theater</h6>
+                <router-link to="/admin/LinkTheaterMovie"><button>+</button></router-link>
             </div>
+        </center>
+    </div>
 </template>
 
 
@@ -81,6 +85,7 @@
 <script>
 
 import axios from 'axios';
+import ConfirmationModal from '@/components/ConfirmationModal.vue';
 
 import refreshAccessToken from '../../../utils/refreshToken'
 
@@ -94,12 +99,42 @@ export default {
             running_table: false,
             stoped_table: false,
             table: false,
+            showModal: false,
+            to_dlt_theater_movie: -1,
         }
     },
     created() {
         this.allTheaterMovies()
     },
+    components: {
+        ConfirmationModal
+    },
     methods: {
+        showConfirmationModal(id) {
+            this.showModal = true;
+            this.to_dlt_theater_movie = id;
+        },
+        async deleteItem() {
+            try {
+                let access_token = localStorage.getItem('access_token')
+
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
+
+                await axios.delete(`http://127.0.0.1:8081/api/dlt/theater_movie/${this.to_dlt_theater_movie}`)
+                console.log("TheaterMovie with id: " + this.to_dlt_theater_movie + " deleted")
+                await this.allTheaterMovies()
+            }
+            catch (error) {
+                console.error(error);
+                alert("An error occurred while deleting Theatermovie");
+            }
+            this.showModal = false; // Close the modal
+            this.to_dlt_theater_movie = -1;
+        },
+        cancelDelete() {
+            this.showModal = false; // Close the modal
+            this.to_dlt_theater_movie = -1;
+        },
         async allTheaterMovies() {
             try {
                 let access_token = localStorage.getItem('access_token')
@@ -147,21 +182,21 @@ export default {
                 }
             }
         },
-        async dltTheaterMovie(id) {
-            try {
-                let access_token = localStorage.getItem('access_token')
+        // async dltTheaterMovie(id) {
+        //     try {
+        //         let access_token = localStorage.getItem('access_token')
 
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
+        //         axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
 
-                await axios.delete(`http://127.0.0.1:8081/api/dlt/theater_movie/${id}`)
-                console.log("TheaterMovie with id: " + id + " deleted")
-                await this.allTheaterMovies()
-            }
-            catch (error) {
-                console.error(error);
-                alert("An error occurred while deleting Theatermovie");
-            }
-        }
+        //         await axios.delete(`http://127.0.0.1:8081/api/dlt/theater_movie/${id}`)
+        //         console.log("TheaterMovie with id: " + id + " deleted")
+        //         await this.allTheaterMovies()
+        //     }
+        //     catch (error) {
+        //         console.error(error);
+        //         alert("An error occurred while deleting Theatermovie");
+        //     }
+        // }
     },
 }
 </script>

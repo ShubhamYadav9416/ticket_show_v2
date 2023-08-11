@@ -4,7 +4,7 @@ from application.utils.image_encoder import image_to_base64
 
 from application.cache import cache
 
-@cache.cached(timeout=50 , key_prefix='get_all_theaters')
+@cache.cached(timeout=1 , key_prefix='get_all_theaters')
 def get_all_theaters():
     theaters = Theater.query.all()
     theaters_list = []
@@ -12,7 +12,7 @@ def get_all_theaters():
         theaters_list.append({'theater_id': theater.theater_id ,'theater_id': theater.theater_id ,'theater_name': theater.theater_name, "theater_place" : theater.theater_place, "theater_location": theater.theater_location, "theater_capacity": theater.theater_capacity})
     return theaters_list
 
-@cache.cached(timeout=50, key_prefix='get_all_movies')
+@cache.cached(timeout=1, key_prefix='get_all_movies')
 def get_all_movies():
     movies = Movie.query.all()
     movies_list = []

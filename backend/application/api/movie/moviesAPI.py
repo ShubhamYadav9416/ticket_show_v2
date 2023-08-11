@@ -8,7 +8,7 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended.view_decorators import jwt_required
 
 # import internal functions
-from application.data.models import db,Movie
+from application.data.models import db,Movie,TheaterMovie,Booking,Dyanmic
 from application.config import ALLOWED_IMAGE_EXTENSIONS
 from application.utils.save_movie_img import save_movie_image
 from application.utils.image_encoder import image_to_base64
@@ -122,6 +122,16 @@ class MovieAPI(Resource):
     @jwt_required()
     @marshal_with(resource_fields)
     def delete(self, movie_id):
+        theatermovies = TheaterMovie.query.filter_by(movie_id = movie_id).all()
+        if theatermovies:
+            for theatermovie in theatermovies:
+                bookings = Booking.query.filter_by(theater_movie_id = theatermovie.theater_movie_id).all()
+                if bookings:
+                    for booking in bookings:
+                        db.session.delete(booking)
+                        db.session.commit()
+            db.session.delete(theatermovie)
+            db.session.commit()
         movie = Movie.query.filter_by(movie_id = movie_id).first()
         if not movie:
             abort(404,message= "movie id not exist")

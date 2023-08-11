@@ -5,7 +5,7 @@ from flask_restful import Resource,reqparse,abort,fields,marshal_with
 from flask_jwt_extended.view_decorators import jwt_required
 
 # impo tables and internal functions
-from application.data.models import db,Theater
+from application.data.models import db,Theater,TheaterMovie,Booking,UserTheaterRating
 from application.data.data_access import get_all_theaters
 
 # post args
@@ -94,10 +94,25 @@ class TheaterAPI(Resource):
     @marshal_with(resource_fields)
     @jwt_required()
     def delete(self, theater_id):
+        theater_ratings = UserTheaterRating.query.filter_by(theater_id = theater_id).all()
+        if theater_ratings:
+            for theater_rating in theater_ratings:
+                db.session.delete(theater_rating)
+                db.session.commit()
+        theatermovies = TheaterMovie.query.filter_by(theater_id = theater_id).all()
+        if theatermovies:
+            for theatermovie in theatermovies:
+                print(theatermovie)
+                bookings = Booking.query.filter_by(theater_movie_id = theatermovie.theater_movie_id).all()
+                if bookings:
+                    for booking in bookings:
+                        db.session.delete(booking)
+                        db.session.commit()
+            db.session.delete(theatermovie)
+            db.session.commit()
         theater = Theater.query.filter_by(theater_id = theater_id).first()
         if not theater:
-            # abort(404,message= "theater id not exist")
-            return jsonify({'status':"failed",'message' : 'Theater not exist!'})
+            abort(404,message= "movie id not exist")
         db.session.delete(theater)
         db.session.commit()
         return jsonify({'status':"success",'message' : 'Theater has been deleted!'})

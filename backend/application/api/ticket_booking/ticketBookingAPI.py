@@ -47,13 +47,13 @@ class userBookedTicket(Resource):
         tickets = []
         for booking in bookings:
             theatermovies = TheaterMovie.query.join(Movie,TheaterMovie.movie_id == Movie.movie_id).join(
-            Theater,TheaterMovie.theater_id == Theater.theater_id).filter_by(
-            TheaterMovie.theater_movie_id == booking.theater_movie_id).add_columns(
+            Theater,TheaterMovie.theater_id == Theater.theater_id).add_columns(
             TheaterMovie.theater_movie_id,TheaterMovie.timing,Movie.movie_name, Movie.movie_tag,Movie.movie_duration, Movie.movie_language,
             Theater.theater_place,Theater.theater_location,Theater.theater_name, Movie.movie_image_path,
             TheaterMovie.timing).all()
             for theatermovie in theatermovies:
-                tickets.append({'id': booking.booking_id ,'movie_name':theatermovie.movie_name, 'theater_location':theatermovie.theater_location, 'theater_place':theatermovie.theater_place,'theater_name': theatermovie.theater_name,
+                if theatermovie.theater_movie_id == booking.theater_movie_id:
+                    tickets.append({'id': booking.booking_id ,'movie_name':theatermovie.movie_name, 'theater_location':theatermovie.theater_location, 'theater_place':theatermovie.theater_place,'theater_name': theatermovie.theater_name,
                             'movie_tag':theatermovie.movie_tag, 'movie_duration':theatermovie.movie_duration, 'movie_language':theatermovie.movie_language,'show_time':theatermovie.timing,
                             'no_of_tickets':booking.no_of_tickets, 'price':booking.total_paid, 'booking_time':str(booking.booking_time),'booking_id':booking.booking_id,"poster_url": image_to_base64(theatermovie.movie_image_path)})
         return jsonify({'user_id':user.user_id,'user_mail':user.user_mail, 'tickets': tickets})

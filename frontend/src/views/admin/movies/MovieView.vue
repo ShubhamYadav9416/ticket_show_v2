@@ -33,10 +33,14 @@
                                 <td>
                                     <img :src=movie.poster_url style="max-height: 70px; max-width: 35px;">
                                 </td>
-                                <td><a @click="dltMovie(movie.movie_id)"><i class="bi bi-trash-fill"
+                                <td><a @click="showConfirmationModal(movie.movie_id)"><i class="bi bi-trash-fill"
                                             style="color: brown;"></i></a>/
                                     <router-link :to="`/admin/movie/edit/${movie.movie_id}`"><i class="bi bi-pencil-square"
                                             style="color: grey;"></i></router-link>
+                                    <div>
+                                        <ConfirmationModal v-if="showModal" message="Are you sure you want to delete?"
+                                            :onConfirm="deleteItem" :onCancel="cancelDelete" />
+                                    </div>
                                 </td>
                             </tr>
                         </table>
@@ -78,7 +82,7 @@
 
 import axios from 'axios';
 
-
+import ConfirmationModal from '@/components/ConfirmationModal.vue';
 import AdminHeader from '../../../components/AdminHeader'
 
 import refreshAccessToken from '../../../utils/refreshToken'
@@ -91,12 +95,40 @@ export default {
             no_table: false,
             posterUrl: "",
             poster: "",
+            showModal: false,
+            movie_id_to_delete: -1,
+
         }
     },
     created() {
         this.allMovies()
     },
     methods: {
+        showConfirmationModal(id) {
+            this.showModal = true;
+            this.movie_id_to_delete = id;
+        },
+        async deleteItem() {
+            try {
+                let access_token = localStorage.getItem('access_token')
+
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
+
+                await axios.delete(`http://127.0.0.1:8081/api/movie/${this.movie_id_to_delete}`)
+                console.log("Movie with id: " + this.movie_id_to_delete + " deleted")
+                await this.allMovies()
+            }
+            catch (error) {
+                console.error(error);
+                alert("Error while deleteing movie");
+            }
+            this.showModal = false; // Close the modal
+            this.movie_id_to_delete = -1;
+        },
+        cancelDelete() {
+            this.showModal = false; // Close the modal
+            this.movie_id_to_delete = -1;
+        },
         async allMovies() {
             try {
                 let access_token = localStorage.getItem('access_token')
@@ -108,7 +140,7 @@ export default {
                 if (this.movies.length > 0) {
                     console.log("Movie data fletch")
                     this.show_table = true
-                    for (let movie of this.movies){
+                    for (let movie of this.movies) {
                         this.movies[movie.movie_id - 1].poster_url = `data:image/jpeg;base64,${this.movies[movie.movie_id - 1].poster_url}`
                     }
                 }
@@ -130,24 +162,25 @@ export default {
                 }
             }
         },
-        async dltMovie(id) {
-            try {
-                let access_token = localStorage.getItem('access_token')
+        // async dltMovie(id) {
+        //     try {
+        //         let access_token = localStorage.getItem('access_token')
 
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
+        //         axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
 
-                await axios.delete(`http://127.0.0.1:8081/api/movie/${id}`)
-                console.log("Movie with id: " + id + " deleted")
-                await this.allMovies()
-            }
-            catch (error) {
-                console.error(error);
-                alert("Movie running in theater");
-            }
-        },
+        //         await axios.delete(`http://127.0.0.1:8081/api/movie/${id}`)
+        //         console.log("Movie with id: " + id + " deleted")
+        //         await this.allMovies()
+        //     }
+        //     catch (error) {
+        //         console.error(error);
+        //         alert("Movie running in theater");
+        //     }
+        // },
     },
     components: {
-        'admin-header': AdminHeader
+        'admin-header': AdminHeader,
+        ConfirmationModal
     }
 }
 </script>

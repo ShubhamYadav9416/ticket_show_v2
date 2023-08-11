@@ -26,10 +26,18 @@
                             <td>{{ theater.theater_place }}</td>
                             <td>{{ theater.theater_location }}</td>
                             <td>{{ theater.theater_capacity }}</td>
-                            <td><a id="dlt" @click="dltTheater(theater.theater_id)"><i class="bi bi-trash-fill" style="color: brown;"></i></a>/
-                                <router-link  :to="`/admin/theater/edit/${theater.theater_id}`"><i class="bi bi-pencil-square" style="color: grey;"></i></router-link></td>
-                            <td> <button type="button" class="btn btn-primary" @click="triggerCSVExport(theater.theater_id)"><i class="bi bi-cloud-arrow-down"></i></button> </td>
-
+                            <td><a id="dlt" @click="showConfirmationModal(theater.theater_id)"><i class="bi bi-trash-fill"
+                                        style="color: brown;"></i></a>/
+                                <router-link :to="`/admin/theater/edit/${theater.theater_id}`"><i
+                                        class="bi bi-pencil-square" style="color: grey;"></i></router-link>
+                            </td>
+                            <td> <button type="button" class="btn btn-primary"
+                                    @click="triggerCSVExport(theater.theater_id)"><i
+                                        class="bi bi-cloud-arrow-down"></i></button> </td>
+                                        <div>
+                                        <ConfirmationModal v-if="showModal" message="Are you sure you want to delete?"
+                                            :onConfirm="deleteItem" :onCancel="cancelDelete" />
+                                    </div>
                         </tr>
                     </table>
                 </div>
@@ -44,12 +52,15 @@
                         <div class="row">
                             <div class="col">
                                 <h6>To Add New Theater</h6>
-                                <router-link to="/admin/add_theater"><button class="add_button"><center>+</center></button></router-link>
+                                <router-link to="/admin/add_theater"><button class="add_button">
+                                        <center>+</center>
+                                    </button></router-link>
                             </div>
                             <div class="col"></div>
                             <div class="col">
                                 <h6>To Add New Movie in Theater</h6>
-                                <router-link to="/admin/LinkTheaterMovie"><button class="add_button">+</button></router-link>
+                                <router-link to="/admin/LinkTheaterMovie"><button
+                                        class="add_button">+</button></router-link>
                             </div>
                         </div>
                     </div>
@@ -66,7 +77,7 @@
 
 import axios from 'axios';
 import AdminHeader from '../../../components/AdminHeader'
-
+import ConfirmationModal from '@/components/ConfirmationModal.vue';
 import refreshAccessToken from '../../../utils/refreshToken'
 
 export default {
@@ -75,6 +86,8 @@ export default {
             theaters: {},
             show_table: false,
             no_table: false,
+            showModal: false,
+            theater_id_to_delete: -1,
         }
 
     },
@@ -82,6 +95,31 @@ export default {
         this.allTheaters()
     },
     methods: {
+        showConfirmationModal(id) {
+            this.showModal = true;
+            this.movie_id_to_delete = id;
+        },
+        async deleteItem() {
+            try {
+                let access_token = localStorage.getItem('access_token')
+
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
+
+                await axios.delete(`http://127.0.0.1:8081/api/theater/${this.movie_id_to_delete}`)
+                console.log("theater with id: " + this.movie_id_to_delete + " deleted")
+                await this.allTheaters()
+            }
+            catch (error) {
+                console.error(error);
+                alert("Error while deleteing movie");
+            }
+            this.showModal = false; // Close the modal
+            this.theater_id_to_delete = -1;
+        },
+        cancelDelete() {
+            this.showModal = false; // Close the modal
+            this.theater_id_to_delete = -1;
+        },
         async allTheaters() {
             try {
                 let access_token = localStorage.getItem('access_token')
@@ -92,7 +130,7 @@ export default {
                 this.theaters = theatersResponse.data
                 if (this.theaters.length > 0) {
                     console.log("Theater data fetched")
-                    this.no_table=false
+                    this.no_table = false
                     this.show_table = true
                 }
                 else {
@@ -113,22 +151,22 @@ export default {
                 }
             }
         },
-        async dltTheater(id){
-            try{
-                let access_token = localStorage.getItem('access_token')
+        // async dltTheater(id) {
+        //     try {
+        //         let access_token = localStorage.getItem('access_token')
 
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
-            
-                await axios.delete(`http://127.0.0.1:8081/api/theater/${id}`)
-                console.log("theater with id: " + id + " deleted")
-                await this.allTheaters()
-            }
-            catch (error){
-                console.error(error);
-                alert("Theater has Movie running.");
-            }
+        //         axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
 
-        },
+        //         await axios.delete(`http://127.0.0.1:8081/api/theater/${id}`)
+        //         console.log("theater with id: " + id + " deleted")
+        //         await this.allTheaters()
+        //     }
+        //     catch (error) {
+        //         console.error(error);
+        //         alert("Theater has Movie running.");
+        //     }
+
+        // },
         async triggerCSVExport(id) {
             try {
                 let access_token = localStorage.getItem('access_token')
@@ -150,7 +188,8 @@ export default {
         }
     },
     components: {
-        'admin-header': AdminHeader
+        'admin-header': AdminHeader,
+        ConfirmationModal
     }
 }
 </script>
@@ -163,7 +202,7 @@ export default {
     padding: 0;
 }
 
-.add_button{
+.add_button {
     background-color: rgb(165, 165, 231);
     border: 0;
     color: white;
@@ -173,9 +212,11 @@ export default {
     text-align: center;
     border-radius: 2rem;
 }
-.add_button:hover{
+
+.add_button:hover {
     background-color: rgb(126, 126, 230);
 }
+
 table {
     /* border: 1px solid black; */
     border-collapse: collapse;
@@ -207,5 +248,4 @@ tr:nth-child(even) {
 
 tr:nth-child(odd) {
     background-color: whitesmoke;
-}
-</style>
+}</style>
