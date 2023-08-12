@@ -109,7 +109,9 @@ const routes = [
     {
         path : "/search/result",
         name: "search-result",
-        props:route => ({ theater_movies: route.query.allTheaterMovieResponse }),
+        props:route => ({ theater_movies: route.query.allTheaterMovieResponse,
+                        filter_results: route.query.filter_results,
+                        search_results : route.query.search_results }),
         component: SearchResult,
     }
 ];

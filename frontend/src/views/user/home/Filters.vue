@@ -13,12 +13,6 @@
             <dd @click="filter_by_rate(1)"><i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i
                     class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i></dd>
         </div>
-        <div class="filter_tags">
-            <dt>Filter by Tags</dt>
-            <dd>Action</dd>
-            <dd>Romance</dd>
-            <!-- {{ theater_movies_for_filters }} -->
-        </div>
     </div>
 </template>
 
@@ -71,13 +65,14 @@ export default {
                     }
                 }
             }
-            const theater_movies_filtered = this.filtered_theaters
-            console.log(theater_movies_filtered)
+            const allTheaterMovieResponse = this.filtered_theaters
+            // console.log(theater_movies_filtered)
             this.$router.push({
                     name: 'search-result',
                     query : {
-                        theater_movies_filtered
-
+                        allTheaterMovieResponse,
+                        filter_results: true,
+                        search_results: false
                     }
                 })
 

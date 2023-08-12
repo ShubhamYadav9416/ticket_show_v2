@@ -12,7 +12,6 @@
                             <div class="col center-block" v-for="theater_movie in theater_movies"
                                 :key="theater_movie.theater_id">
                                 <theater-view style="margin-bottom: 20px;" :theater="theater_movie"></theater-view>
-{{ theater_movies }}
                             </div>
                         </div>
                     </div>

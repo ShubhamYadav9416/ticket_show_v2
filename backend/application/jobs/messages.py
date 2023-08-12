@@ -90,6 +90,10 @@ def send_daily_mail_to_user(id):
     mail(user.user_mail, subject=subject, message=message, content='html')
 
 
+# ---------------------------------------------------------------
+# Monthly Entertainment report
+# ---------------------------------------------------------------
+
 @shared_task(ignore_result=False)
 def send_monthly_to_user(id, email):
     user = User.query.filter_by(user_id=id).first()

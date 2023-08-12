@@ -101,7 +101,9 @@ export default {
                 this.$router.push({
                     name: 'search-result',
                     query : {
-                        allTheaterMovieResponse
+                        allTheaterMovieResponse,
+                        filter_results: false,
+                        search_results: true
                     }
                 })
             }
@@ -127,7 +129,9 @@ export default {
                 this.$router.push({
                     name: 'search-result',
                     query : {
-                        allTheaterMovieResponse
+                        allTheaterMovieResponse,
+                        filter_results: false,
+                        search_results: true
                     }
                 })
             }
