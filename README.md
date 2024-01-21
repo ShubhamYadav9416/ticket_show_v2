@@ -81,7 +81,7 @@ git clone https://github.com/ShubhamYadav9416/Ticket_show_app.git
 
 ```
 Install flatpak: pip insatll flatpak
-add flatpak repo: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+add flatpak repo: sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 Install RedisInsight using flatpak: flatpak install flathub com.redis.RedisInsight
 REDIS SERVER : flatpak run com.redis.RedisInsight
 Install go: sudo apt-get -y install golang-go
