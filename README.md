@@ -81,7 +81,9 @@ git clone https://github.com/ShubhamYadav9416/Ticket_show_app.git
 
 ```
 REDIS SERVER : flatpak run com.redis.RedisInsight
-MAILHOG : ~go/bin/MailHog
+Install go: sudo apt-get -y install golang-go
+install MailHog Using go: go install github.com/mailhog/MailHog@latest
+MAILHOG : ~/go/bin/MailHog
 ```
 
 4. Navigate to the backend folder and open three separate terminals. Execute the following commands in each:
