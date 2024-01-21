@@ -80,6 +80,9 @@ git clone https://github.com/ShubhamYadav9416/Ticket_show_app.git
 3. Open two separate terminals and execute the following commands in each:
 
 ```
+Install flatpak: pip insatll flatpak
+add flatpak repo: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+Install RedisInsight using flatpak: flatpak install flathub com.redis.RedisInsight
 REDIS SERVER : flatpak run com.redis.RedisInsight
 Install go: sudo apt-get -y install golang-go
 install MailHog Using go: go install github.com/mailhog/MailHog@latest
