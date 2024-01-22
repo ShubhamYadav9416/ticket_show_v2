@@ -79,21 +79,40 @@ git clone https://github.com/ShubhamYadav9416/Ticket_show_app.git
 
 3. Open two separate terminals and execute the following commands in each:
 
+- To install Redis and run(after running each line close the terminal and run next line new terminal.)
+  
 ```
 Install flatpak: pip insatll flatpak
 add flatpak repo: sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 Install RedisInsight using flatpak: flatpak install flathub com.redis.RedisInsight
 REDIS SERVER : flatpak run com.redis.RedisInsight
+```
+
+-To install and run Mailhog
+
+```
 Install go: sudo apt-get -y install golang-go
 install MailHog Using go: go install github.com/mailhog/MailHog@latest
 MAILHOG : ~/go/bin/MailHog
 ```
 
 4. Navigate to the backend folder and open three separate terminals. Execute the following commands in each:
-
+   
+- To run flask app(run virtual environment and pip install all dependencies)
+  
 ```
 BACKEND : python main.py
+```
+
+-To run celery
+
+```
 WORKERS : celery -A main:cel_app worker -l info
+```
+
+-To run celery beat
+
+```
 BEATS : celery -A main:cel_app beat --max-interval 1 -l info
 ```
 
